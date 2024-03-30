@@ -1,17 +1,18 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Text;
 
-StringBuilder builder = new();
-builder.AppendLine("The following arguments are passed:");
+using AudioDelay;
 
-// Display the command line arguments using the args variable.
-foreach (var arg in args)
-{
-    builder.AppendLine($"Argument={arg}");
-}
+Console.WriteLine("Recording started...");
+AudioRecorder recorder = new AudioRecorder();
+recorder.StartRecording();
 
-Console.WriteLine(builder.ToString());
+// Delay for 5 seconds (5000 milliseconds)
+Thread.Sleep(5000);
 
-// Return a success code.
+recorder.StopRecording();
+Console.WriteLine("Recording stopped.");
+
+recorder.GetRecordedData();
+
 return 0;
