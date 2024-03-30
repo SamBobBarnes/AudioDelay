@@ -8,11 +8,11 @@ public class AudioRecorder
     private WaveFileWriter writer;
     private MemoryStream memoryStream;
 
-    public AudioRecorder()
+    public AudioRecorder(WaveFormat format)
     {
         waveIn = new WaveInEvent();
         waveIn.DataAvailable += OnDataAvailable;
-        waveIn.WaveFormat = new WaveFormat(44100, 1); // CD quality audio, mono channel
+        waveIn.WaveFormat = format; // CD quality audio, mono channel
         memoryStream = new MemoryStream();
         writer = new WaveFileWriter(new IgnoreDisposeStream(memoryStream),waveIn.WaveFormat);
     }
