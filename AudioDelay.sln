@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioDelay", "AudioDelay\AudioDelay.csproj", "{1512FDB6-7B2F-40E1-8348-0F09124A779F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{5B30222F-D7A6-4BD1-AD8D-82B3FD283F6D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{1512FDB6-7B2F-40E1-8348-0F09124A779F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1512FDB6-7B2F-40E1-8348-0F09124A779F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1512FDB6-7B2F-40E1-8348-0F09124A779F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B30222F-D7A6-4BD1-AD8D-82B3FD283F6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B30222F-D7A6-4BD1-AD8D-82B3FD283F6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B30222F-D7A6-4BD1-AD8D-82B3FD283F6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B30222F-D7A6-4BD1-AD8D-82B3FD283F6D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
