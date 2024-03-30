@@ -2,34 +2,30 @@
 
 
 using AudioDelay;
-using NAudio.Wave;
 
-var format = new WaveFormat(44100, 1);
+var arguments = HandleArgs.ParseArgs(args);
 
-Console.WriteLine("Recording started...");
-AudioRecorder recorder = new AudioRecorder(format);
-recorder.StartRecording();
+if (arguments.Help)
+{
+    Console.Write(HandleArgs.GetHelpText());
+    return 0;
+}
 
-// Delay for 5 seconds (5000 milliseconds)
-Thread.Sleep(5000);
+AudioRecorderPlayer recorderPlayer = new AudioRecorderPlayer();
+Console.WriteLine("Starting recording and playback...");
+recorderPlayer.Start();
 
-recorder.StopRecording();
-Console.WriteLine("Recording stopped.");
+Thread.Sleep(arguments.Delay);
+Console.WriteLine("Starting playback...");
+recorderPlayer.Play();
 
-var recording = recorder.GetRecordedData();
+Thread.Sleep(arguments.Runtime);
 
-AudioPlayer player = new AudioPlayer(recording, format);
+recorderPlayer.Stop();
+Console.WriteLine("Stopped recording.");
 
-Console.WriteLine("Playing Audio...");
-player.Play();
-
-// Delay for 5 seconds (5000 milliseconds)
-Thread.Sleep(5000);
-
-player.Stop();
-
-player.Dispose();
-
-Console.WriteLine("Audio Finished.");
+Thread.Sleep(arguments.Delay);
+recorderPlayer.StopPlayback();
+Console.WriteLine("Stopped playback.");
 
 return 0;
