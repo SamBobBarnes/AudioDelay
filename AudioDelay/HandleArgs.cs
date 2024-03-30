@@ -112,6 +112,7 @@ public class HandleArgs
                "Options:\n" +
                "--delay [int] - Set the delay in milliseconds\n" +
                "--runtime [int] - Set the runtime in milliseconds\n\n" +
+               "Total runtime = delay + runtime\n\n" +
                "Time format flags:\n" +
                "    --ms - Set the time format to milliseconds\n" +
                "    --s - Set the time format to seconds\n" +
