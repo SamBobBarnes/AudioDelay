@@ -1,5 +1,4 @@
 ﻿using AudioDelay;
-using Xunit;
 using FluentAssertions;
 
 namespace Tests;
@@ -85,46 +84,46 @@ public class HandleArgsTests : HandleArgs
     
     #endregion
     
-    #region ParseRuntime
+    #region ParseContentLength
     
     [Fact]
-    public void ParseRuntime_ShouldReturn5000ByDefault()
+    public void ParseContentLength_ShouldReturn5000ByDefault()
     {
         var args = new List<string>();
 
-        var actual = ParseRuntime(args);
+        var actual = ParseContentLength(args);
 
         actual.Should().Be(5000);
     }
     
     [Fact]
-    public void ParseRuntime_ShouldReturnInputWhenRuntimeFlagIsPresent()
+    public void ParseContentLength_ShouldReturnInputWhenContentLengthFlagIsPresent()
     {
-        var args = new List<string> { "--runtime", "2000" };
+        var args = new List<string> { "--content-length", "2000" };
 
-        var actual = ParseRuntime(args);
+        var actual = ParseContentLength(args);
 
         actual.Should().Be(2000);
     }
     
     [Fact]
-    public void ParseRuntime_ShouldThrowExceptionWhenInputIsMissing()
+    public void ParseContentLength_ShouldThrowExceptionWhenInputIsMissing()
     {
-        var args = new List<string> { "--runtime" };
+        var args = new List<string> { "--content-length" };
 
-        Action act = () => ParseRuntime(args);
+        Action act = () => ParseContentLength(args);
 
-        act.Should().Throw<Exception>().WithMessage("An input following the \"--runtime\" option was not found.\nThe \"--runtime\" option must be followed by a valid integer");
+        act.Should().Throw<Exception>().WithMessage("An input following the \"--content-length\" option was not found.\nThe \"--content-length\" option must be followed by a valid integer");
     }
     
     [Fact]
-    public void ParseRuntime_ShouldThrowExceptionWhenInputIsNotAnInteger()
+    public void ParseContentLength_ShouldThrowExceptionWhenInputIsNotAnInteger()
     {
-        var args = new List<string> { "--runtime", "two" };
+        var args = new List<string> { "--content-length", "two" };
 
-        Action act = () => ParseRuntime(args);
+        Action act = () => ParseContentLength(args);
 
-        act.Should().Throw<Exception>().WithMessage("Error parsing --runtime input. Should be in the format of \"--runtime 5000\"");
+        act.Should().Throw<Exception>().WithMessage("Error parsing --content-length input. Should be in the format of \"--content-length 5000\"");
     }
     
     #endregion
@@ -217,17 +216,27 @@ public class HandleArgsTests : HandleArgs
     }
     
     [Theory]
-    [InlineData("--ms", 3, 2)]
-    [InlineData("--s", 3000, 2000)]
-    [InlineData("--m", 180000, 120000)]
-    [InlineData("--h", 10800000, 7200000)]
+    [InlineData("--ms", 3, 1)]
+    [InlineData("--s", 3000, 1000)]
+    [InlineData("--m", 180000, 60000)]
+    [InlineData("--h", 10800000, 3600000)]
     public void ParseArgs_ShouldConvertTimeWhenTimeFlagIsPresent(string flag, int delayResult, int runtimeResult)
     {
-        var args = new[] { "--delay", "3", "--runtime", "2", flag };
+        var args = new[] { "--delay", "3", "--content-length", "4", flag };
 
         var actual = ParseArgs(args);
 
         actual.Should().BeEquivalentTo(new Arguments{Delay = delayResult, Runtime = runtimeResult, Help = false});
+    }
+    
+    [Fact]
+    public void ParseArgs_ShouldThrowExceptionWhenContentLengthIsLessThanDelay()
+    {
+        var args = new[] { "--delay", "3000", "--content-length", "2000" };
+
+        Action act = () => ParseArgs(args);
+
+        act.Should().Throw<Exception>().WithMessage("Content length must be greater or equal to than the delay.");
     }
     
     #endregion

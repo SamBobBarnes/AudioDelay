@@ -28,7 +28,10 @@ public class HandleArgs
         }
         
         result.Delay = ParseDelay(argsList) * multiplier;
-        result.Runtime = ParseRuntime(argsList) * multiplier;
+        var contentLength = ParseContentLength(argsList) * multiplier;
+        if(contentLength < result.Delay) throw new Exception("Content length must be greater or equal to than the delay.");
+        result.Runtime = contentLength - result.Delay;
+        result.Debug = ParseDebug(argsList);
         
         return result;
     }
@@ -62,23 +65,23 @@ public class HandleArgs
         return delayInt;
     }
 
-    protected static int ParseRuntime(List<string> args)
+    protected static int ParseContentLength(List<string> args)
     {
         var runtimeInt = 5000;
-        if (args.Contains("--runtime"))
+        if (args.Contains("--content-length"))
         {
-            var index = args.IndexOf("--runtime");
+            var index = args.IndexOf("--content-length");
             try
             {
                 runtimeInt = int.Parse(args[index + 1]);
             }
             catch (ArgumentOutOfRangeException e)
             {
-                throw new Exception("An input following the \"--runtime\" option was not found.\nThe \"--runtime\" option must be followed by a valid integer");
+                throw new Exception("An input following the \"--content-length\" option was not found.\nThe \"--content-length\" option must be followed by a valid integer");
             }
             catch (Exception e)
             {
-                throw new Exception("Error parsing --runtime input. Should be in the format of \"--runtime 5000\"");
+                throw new Exception("Error parsing --content-length input. Should be in the format of \"--content-length 5000\"");
             } 
         }
 
@@ -111,8 +114,8 @@ public class HandleArgs
                "It utilizes the default audio input and output devices.\n\n" +
                "Options:\n" +
                "--delay [int] - Set the delay in milliseconds\n" +
-               "--runtime [int] - Set the runtime in milliseconds\n\n" +
-               "Total runtime = delay + runtime\n\n" +
+               "--content-length [int] - Set the content length in milliseconds\n\n" +
+               "    Content length must be greater than the delay\n\n" +
                "Time format flags:\n" +
                "    --ms - Set the time format to milliseconds\n" +
                "    --s - Set the time format to seconds\n" +
@@ -120,10 +123,10 @@ public class HandleArgs
                "    --h - Set the time format to hours\n\n" +
                "    If no time format flag is present, milliseconds will be used\n\n" +
                "Example usage:\n" +
-               "    \"audiodelay --delay 5 --runtime 10 --s\"\n" +
+               "    \"audiodelay --delay 5 --content-length 10 --s\"\n" +
                "    This will record audio for 10 seconds and play it back with a 5 second delay\n" +
                "    The time format is set to seconds\n\n" +
-               "    \"audiodelay --delay 5000 --runtime 10000\"\n" +
+               "    \"audiodelay --delay 5000 --content-length 10000\"\n" +
                "    This will record audio for 10 seconds and play it back with a 5 second delay\n" +
                "    The time format is set to milliseconds\n\n";
     }
