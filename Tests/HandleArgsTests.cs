@@ -193,6 +193,40 @@ public class HandleArgsTests : HandleArgs
     
     #endregion
     
+    #region ParseDebug
+    
+    [Fact]
+    public void ParseDebug_ShouldReturnFalseByDefault()
+    {
+        var args = new List<string>();
+
+        var actual = ParseDebug(args);
+
+        actual.Should().BeFalse();
+    }
+    
+    [Fact]
+    public void ParseDebug_ShouldReturnTrueWhenDebugFlagIsPresent()
+    {
+        var args = new List<string> { "--debug" };
+
+        var actual = ParseDebug(args);
+
+        actual.Should().BeTrue();
+    }
+    
+    [Fact]
+    public void ParseDebug_ShouldReturnTrueWhenDebugFlagIsPresent_Short()
+    {
+        var args = new List<string> { "-d" };
+
+        var actual = ParseDebug(args);
+
+        actual.Should().BeTrue();
+    }
+    
+    #endregion
+    
     #region ParseArgs
     
     [Fact]
@@ -202,17 +236,17 @@ public class HandleArgsTests : HandleArgs
 
         var actual = ParseArgs(args);
 
-        actual.Should().BeEquivalentTo(new Arguments{Delay = 5000, Runtime = 5000, Help = false});
+        actual.Should().BeEquivalentTo(new Arguments{Delay = 5000, Runtime = 0, Help = false, Debug = false});
     }
     
     [Fact]
     public void ParseArgs_ShouldReturnValuesWhenArgsArePassed()
     {
-        var args = new[] { "--delay", "2000", "--runtime", "3000", "--help" };
+        var args = new[] { "--delay", "2000", "--content-length", "3000", "--help", "--debug" };
 
         var actual = ParseArgs(args);
 
-        actual.Should().BeEquivalentTo(new Arguments{Delay = 2000, Runtime = 3000, Help = true});
+        actual.Should().BeEquivalentTo(new Arguments{Delay = 2000, Runtime = 1000, Help = true, Debug = true});
     }
     
     [Theory]

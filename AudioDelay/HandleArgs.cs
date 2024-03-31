@@ -106,6 +106,12 @@ public class HandleArgs
         
         return "ms";
     }
+    
+    protected static bool ParseDebug(List<string> args)
+    {
+        if (args.Contains("--debug") || args.Contains("-d")) return true;
+        return false;
+    }
 
     public static string GetHelpText()
     {
@@ -122,6 +128,7 @@ public class HandleArgs
                "    --m - Set the time format to minutes\n" +
                "    --h - Set the time format to hours\n\n" +
                "    If no time format flag is present, milliseconds will be used\n\n" +
+               "--debug - Enable debug mode\n\n\n" +
                "Example usage:\n" +
                "    \"audiodelay --delay 5 --content-length 10 --s\"\n" +
                "    This will record audio for 10 seconds and play it back with a 5 second delay\n" +
