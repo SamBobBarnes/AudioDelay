@@ -32,7 +32,7 @@ void Wait(int ms)
 {
     if (arguments.Debug)
     {
-        Debug.WriteLine($"Waiting for {ms} milliseconds...");
+        Console.WriteLine($"Waiting for {ms} milliseconds...");
 
 
         for (int temp = 0; temp < ms; temp += 1000)
@@ -46,10 +46,10 @@ void Wait(int ms)
                 Thread.Sleep(1000);
             }
 
-            Debug.WriteLine($"Waited for {(double)temp / 1000} seconds...");
+            Console.WriteLine($"Waited for {(double)temp / 1000} seconds...");
         }
 
-        Debug.WriteLine("Done waiting.");
+        Console.WriteLine("Done waiting.");
     }
     else
     {
