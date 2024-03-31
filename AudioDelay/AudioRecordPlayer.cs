@@ -7,7 +7,7 @@ public class AudioRecorderPlayer
     private WaveOutEvent waveOut;
     private BufferedWaveProvider bufferedWaveProvider;
 
-    public AudioRecorderPlayer()
+    public AudioRecorderPlayer(int recordingLength)
     {
         // Set up recording
         waveIn = new WaveInEvent();
@@ -17,7 +17,7 @@ public class AudioRecorderPlayer
         // Set up playback
         waveOut = new WaveOutEvent();
         bufferedWaveProvider = new BufferedWaveProvider(waveIn.WaveFormat);
-        bufferedWaveProvider.BufferDuration = TimeSpan.FromMinutes(10);
+        bufferedWaveProvider.BufferDuration = TimeSpan.FromMilliseconds(recordingLength);
         waveOut.Init(bufferedWaveProvider);
     }
 
