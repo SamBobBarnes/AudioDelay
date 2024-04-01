@@ -9,11 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        runtime: [win-x64, linux-x64, osx-x64]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -23,18 +19,26 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Build and publish
+      - name: Build and publish win-x64
         run: |
-          dotnet publish -c Release --self-contained true --runtime ${RUNTIME} -p:PublishSingleFile=true -o ./publish
-        env:
-          RUNTIME: ${{ matrix.runtime }}
+          dotnet publish -c Release --self-contained true --runtime win-x64 -p:PublishSingleFile=true -o ./publish/win-x64
+        working-directory: ./AudioDelay
+        
+      - name: Build and publish linux-x64
+        run: |
+          dotnet publish -c Release --self-contained true --runtime linux-x64 -p:PublishSingleFile=true -o ./publish/linux-x64
+        working-directory: ./AudioDelay
+        
+      - name: Build and publish osx-x64
+        run: |
+          dotnet publish -c Release --self-contained true --runtime osx-x64 -p:PublishSingleFile=true -o ./publish/osx-x64
         working-directory: ./AudioDelay
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}
-          path: ./AudioDelay/publish/*
+          name: AudioDelay
+          path: ./AudioDelay/publish
 
   release:
     needs: build
@@ -54,12 +58,32 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
+      - name: Add artifacts to release win-x64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ matrix.os }}
-          asset_name: ${{ matrix.os }}.zip
-          asset_content_type: application/zip
+          asset_path: ./AudioDelay/publish/win-x64/AudioDelay.exe
+          asset_name: AudioDelay-win-x64.exe
+          asset_content_type: application/octet-stream
+        
+      - name: Add artifacts to release linux-x64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./AudioDelay/publish/linux-x64/AudioDelay
+          asset_name: AudioDelay-linux-x64
+          asset_content_type: application/octet-stream
+          
+      - name: Add artifacts to release osx-x64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./AudioDelay/publish/osx-x64/AudioDelay
+          asset_name: AudioDelay-osx-x64
+          asset_content_type: application/octet-stream
