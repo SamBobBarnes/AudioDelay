@@ -50,7 +50,7 @@ jobs:
         id: create_release
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: ${{ secrets.PAT }}
           automatic_release_tag: ${{ github.ref }}
           title: ${{ github.ref }}
           draft: true
@@ -59,7 +59,7 @@ jobs:
       - name: Add artifacts to release win-x64
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./AudioDelay/publish/win-x64/AudioDelay.exe
@@ -69,7 +69,7 @@ jobs:
       - name: Add artifacts to release linux-x64
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./AudioDelay/publish/linux-x64/AudioDelay
@@ -79,7 +79,7 @@ jobs:
       - name: Add artifacts to release osx-x64
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./AudioDelay/publish/osx-x64/AudioDelay
