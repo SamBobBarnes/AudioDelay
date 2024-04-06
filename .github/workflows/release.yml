@@ -43,74 +43,76 @@ jobs:
         with:
           name: AudioDelay
           path: ./AudioDelay
+          
+      - run: ls
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: true
-          prerelease: false
-
-      - name: Add artifacts to release win-x64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./AudioDelay/publish/win-x64/AudioDelay.exe
-          asset_name: AudioDelay-win-x64.exe
-          asset_content_type: application/octet-stream
-          
-      - name: Add artifacts to release win-arm64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./AudioDelay/publish/win-arm64/AudioDelay.exe
-          asset_name: AudioDelay-win-arm64.exe
-          asset_content_type: application/octet-stream
-        
-      - name: Add artifacts to release linux-x64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./AudioDelay/publish/linux-x64/AudioDelay
-          asset_name: AudioDelay-linux-x64
-          asset_content_type: application/octet-stream
-          
-      - name: Add artifacts to release linux-arm64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./AudioDelay/publish/linux-arm64/AudioDelay
-          asset_name: AudioDelay-linux-arm64
-          asset_content_type: application/octet-stream
-        
-      - name: Add artifacts to release osx-x64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./AudioDelay/publish/osx-x64/AudioDelay
-          asset_name: AudioDelay-osx-x64
-          asset_content_type: application/octet-stream
-          
-      - name: Add artifacts to release osx-arm64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./AudioDelay/publish/osx-arm64/AudioDelay
-          asset_name: AudioDelay-osx-arm64
-          asset_content_type: application/octet-stream
+#      - name: Create Release
+#        id: create_release
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PAT }}
+#        with:
+#          tag_name: ${{ github.ref }}
+#          release_name: Release ${{ github.ref }}
+#          draft: true
+#          prerelease: false
+#
+#      - name: Add artifacts to release win-x64
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PAT }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ./AudioDelay/publish/win-x64/AudioDelay.exe
+#          asset_name: AudioDelay-win-x64.exe
+#          asset_content_type: application/octet-stream
+#          
+#      - name: Add artifacts to release win-arm64
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PAT }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ./AudioDelay/publish/win-arm64/AudioDelay.exe
+#          asset_name: AudioDelay-win-arm64.exe
+#          asset_content_type: application/octet-stream
+#        
+#      - name: Add artifacts to release linux-x64
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PAT }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ./AudioDelay/publish/linux-x64/AudioDelay
+#          asset_name: AudioDelay-linux-x64
+#          asset_content_type: application/octet-stream
+#          
+#      - name: Add artifacts to release linux-arm64
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PAT }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ./AudioDelay/publish/linux-arm64/AudioDelay
+#          asset_name: AudioDelay-linux-arm64
+#          asset_content_type: application/octet-stream
+#        
+#      - name: Add artifacts to release osx-x64
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PAT }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ./AudioDelay/publish/osx-x64/AudioDelay
+#          asset_name: AudioDelay-osx-x64
+#          asset_content_type: application/octet-stream
+#          
+#      - name: Add artifacts to release osx-arm64
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PAT }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ./AudioDelay/publish/osx-arm64/AudioDelay
+#          asset_name: AudioDelay-osx-arm64
+#          asset_content_type: application/octet-stream
