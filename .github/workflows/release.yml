@@ -44,7 +44,7 @@ jobs:
           name: AudioDelay
           path: ./AudioDelay
           
-      - run: ls
+      - run: ls ./AudioDelay/publish
 
 #      - name: Create Release
 #        id: create_release
