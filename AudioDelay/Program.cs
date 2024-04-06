@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics;
 using AudioDelay;
+using AudioDelay.Helpers;
+
+var delayHandler = new DelayHandler(new ThreadHandler());
 
 var arguments = HandleArgs.ParseArgs(args);
 
@@ -10,49 +13,23 @@ if (arguments.Help)
 }
 
 AudioRecorderPlayer recorderPlayer = new AudioRecorderPlayer(arguments.RecordingLength);
+
 Console.WriteLine("Starting recording and playback...");
 recorderPlayer.Start();
 
-Wait(arguments.Delay);
+delayHandler.Wait(arguments.Delay, arguments.Debug);
+
 Console.WriteLine("Starting playback...");
 recorderPlayer.Play();
 
-Wait(arguments.Runtime);
+delayHandler.Wait(arguments.Runtime, arguments.Debug);
 
 recorderPlayer.Stop();
 Console.WriteLine("Stopped recording.");
 
-Wait(arguments.Delay);
+delayHandler.Wait(arguments.Delay, arguments.Debug);
+
 recorderPlayer.StopPlayback();
 Console.WriteLine("Stopped playback.");
 
 return 0;
-
-void Wait(int ms)
-{
-    if (arguments.Debug)
-    {
-        Console.WriteLine($"Waiting for {ms} milliseconds...");
-
-
-        for (int temp = 0; temp < ms; temp += 1000)
-        {
-            if (ms - temp < 1000)
-            {
-                Thread.Sleep(ms - temp);
-            }
-            else
-            {
-                Thread.Sleep(1000);
-            }
-
-            Console.WriteLine($"Waited for {(double)temp / 1000} seconds...");
-        }
-
-        Console.WriteLine("Done waiting.");
-    }
-    else
-    {
-        Thread.Sleep(ms);
-    }
-}
