@@ -52,11 +52,11 @@ public class HandleArgs
             {
                 delayInt = int.Parse(args[index + 1]);
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 throw new Exception("An input following the \"--delay\" option was not found.\nThe \"--delay\" option must be followed by a valid integer");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new Exception("Error parsing --delay input. Should be in the format of \"--delay 5000\"");
             } 
@@ -75,11 +75,11 @@ public class HandleArgs
             {
                 runtimeInt = int.Parse(args[index + 1]);
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 throw new Exception("An input following the \"--content-length\" option was not found.\nThe \"--content-length\" option must be followed by a valid integer");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new Exception("Error parsing --content-length input. Should be in the format of \"--content-length 5000\"");
             } 

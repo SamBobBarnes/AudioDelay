@@ -11,13 +11,15 @@ public class AudioRecorderPlayer
     {
         // Set up recording
         waveIn = new WaveInEvent();
-        waveIn.DataAvailable += OnDataAvailable;
+        waveIn.DataAvailable += OnDataAvailable!;
         waveIn.WaveFormat = new WaveFormat(44100, 1); // CD quality audio, mono channel
 
         // Set up playback
         waveOut = new WaveOutEvent();
-        bufferedWaveProvider = new BufferedWaveProvider(waveIn.WaveFormat);
-        bufferedWaveProvider.BufferDuration = TimeSpan.FromMilliseconds(recordingLength);
+        bufferedWaveProvider = new BufferedWaveProvider(waveIn.WaveFormat)
+        {
+            BufferDuration = TimeSpan.FromMilliseconds(recordingLength)
+        };
         waveOut.Init(bufferedWaveProvider);
     }
 
@@ -34,13 +36,11 @@ public class AudioRecorderPlayer
     public void Start()
     {
         waveIn.StartRecording();
-        // waveOut.Play();
     }
 
     public void Stop()
     {
         waveIn.StopRecording();
-        // waveOut.Stop();
     }
 
     private void OnDataAvailable(object sender, WaveInEventArgs e)
