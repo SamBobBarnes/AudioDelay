@@ -45,8 +45,7 @@ jobs:
         
       - name: Build
         run: |
-          ls
-          cd AudioDelay/AudioDelay
+          cd AudioDelay
           dotnet build --no-restore
         
       - name: Run
