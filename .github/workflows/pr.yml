@@ -44,9 +44,7 @@ jobs:
         run: dotnet restore
         
       - name: Build
-        run: |
-          cd AudioDelay
-          dotnet build --no-restore
+        run: "./AudioDelay/bin/Debug/net8.0/AudioDelay${{ matrix.os == 'windows-latest' ? '.exe' : '' }}"
         
       - name: Run
         run: dotnet run --no-build --verbosity normal
