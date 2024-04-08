@@ -44,7 +44,9 @@ jobs:
         run: dotnet restore
         
       - name: Build
-        run: dotnet build --no-restore
+        run: |
+          cd AudioDelay/AudioDelay
+          dotnet build --no-restore
         
       - name: Run
         run: dotnet run --no-build --verbosity normal
