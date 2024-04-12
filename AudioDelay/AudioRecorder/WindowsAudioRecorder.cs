@@ -2,13 +2,13 @@
 using NAudio.Wave;
 
 namespace AudioDelay.AudioRecorder;
-public class WindowsAudioRecorder : IAudioRecorder
+public class WindowsAudioRecorder : AudioRecorder
 {
     private readonly WaveInEvent _waveIn;
     private readonly WaveOutEvent _waveOut;
     private readonly BufferedWaveProvider _bufferedWaveProvider;
 
-    public WindowsAudioRecorder(Arguments args)
+    public WindowsAudioRecorder(Arguments args): base(args)
     {
         // Set up recording
         _waveIn = new WaveInEvent();
@@ -24,22 +24,22 @@ public class WindowsAudioRecorder : IAudioRecorder
         _waveOut.Init(_bufferedWaveProvider);
     }
 
-    public void Play()
+    public override void Play()
     {
         _waveOut.Play();
     }
 
-    public void StopPlayback()
+    public override void StopPlayback()
     {
         _waveOut.Stop();
     }
     
-    public void Start()
+    public override void Start()
     {
         _waveIn.StartRecording();
     }
 
-    public void Stop()
+    public override void Stop()
     {
         _waveIn.StopRecording();
     }

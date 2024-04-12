@@ -18,7 +18,7 @@ if (arguments.Help)
     return 0;
 }
 
-IAudioRecorder recorder;
+AudioRecorder recorder;
 
 switch (runtime)
 {
