@@ -181,7 +181,7 @@ public class HandleArgs(IDeviceHandler deviceHandler)
         {
             var outputDevice = int.Parse(args[index + 1]);
             var deviceCount = deviceHandler.GetOutputDeviceCount();
-            if (outputDevice < 0 || outputDevice > deviceCount) throw new ArgumentOutOfRangeException(nameof(outputDevice),outputDevice.ToString());
+            if (outputDevice < 0 || outputDevice >= deviceCount) throw new ArgumentOutOfRangeException(nameof(outputDevice),outputDevice.ToString());
             return outputDevice;
         }
         catch (ArgumentOutOfRangeException e)

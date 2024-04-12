@@ -23,7 +23,7 @@ IAudioRecorder recorder;
 switch (runtime)
 {
     case "win-x64":
-        recorder = new WindowsAudioRecorder(arguments.RecordingLength);
+        recorder = new WindowsAudioRecorder(arguments);
         break;
     default:
         Console.WriteLine("Unsupported OS.");

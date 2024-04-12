@@ -1,5 +1,4 @@
-﻿using System.Text;
-using NAudio.CoreAudioApi;
+﻿using AudioDelay.Args;
 using NAudio.Wave;
 
 namespace AudioDelay.AudioRecorder;
@@ -9,18 +8,20 @@ public class WindowsAudioRecorder : IAudioRecorder
     private readonly WaveOutEvent _waveOut;
     private readonly BufferedWaveProvider _bufferedWaveProvider;
 
-    public WindowsAudioRecorder(int recordingLength)
+    public WindowsAudioRecorder(Arguments args)
     {
         // Set up recording
         _waveIn = new WaveInEvent();
+        _waveIn.DeviceNumber = args.InputDevice-1;
         _waveIn.DataAvailable += OnDataAvailable!;
         _waveIn.WaveFormat = new WaveFormat(44100, 1); // CD quality audio, mono channel
 
         // Set up playback
         _waveOut = new WaveOutEvent();
+        _waveOut.DeviceNumber = args.OutputDevice;
         _bufferedWaveProvider = new BufferedWaveProvider(_waveIn.WaveFormat)
         {
-            BufferDuration = TimeSpan.FromMilliseconds(recordingLength)
+            BufferDuration = TimeSpan.FromMilliseconds(args.RecordingLength),
         };
         _waveOut.Init(_bufferedWaveProvider);
     }

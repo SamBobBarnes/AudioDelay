@@ -365,7 +365,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
     
     [Theory]
     [CombinatorialData]
-    public void ParseOutputDevice_ShouldThrowOutOfRangeExceptionWhenInputIsNotACurrentDevice([CombinatorialValues(-1, 2)] int device)
+    public void ParseOutputDevice_ShouldThrowOutOfRangeExceptionWhenInputIsNotACurrentDevice([CombinatorialValues(-1, 1)] int device)
     {
         var args = new List<string> { "--output-device", device.ToString() };
         _deviceHandler.GetOutputDeviceCount().Returns(1);

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using NAudio.CoreAudioApi;
+using NAudio.Wave;
 
 namespace AudioDelay.Helpers;
 
@@ -53,18 +54,16 @@ public class DeviceHandler : IDeviceHandler
         var enumerator = new MMDeviceEnumerator();
         var stringBuilder = new StringBuilder();
         
-        var i = 1;
+        var inputDevices = enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active).ToList();
 
         stringBuilder.AppendLine("Input devices:");
-        stringBuilder.AppendLine("0: Primary Input Device (Default)");
-        foreach (var endpoint in
-                 enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
+        for(var i = 0; i < WaveInEvent.DeviceCount; i++)
         {
-            stringBuilder.AppendLine($"{i}: {endpoint.FriendlyName}");
-            i++;
+            var deviceName = inputDevices.First(x => x.FriendlyName.StartsWith(WaveInEvent.GetCapabilities(i).ProductName)).FriendlyName;
+            stringBuilder.AppendLine($"{i}: {deviceName}");
         }
         
-        i = 1;
+        var index = 1;
         
         stringBuilder.AppendLine();
         stringBuilder.AppendLine("Playback devices:");
@@ -72,8 +71,8 @@ public class DeviceHandler : IDeviceHandler
         foreach (var endpoint in
                  enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
         {
-            stringBuilder.AppendLine($"{i}: {endpoint.FriendlyName}");
-            i++;
+            stringBuilder.AppendLine($"{index}: {endpoint.FriendlyName}");
+            index++;
         }
         
         return stringBuilder.ToString();
