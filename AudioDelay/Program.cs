@@ -2,19 +2,23 @@
 using AudioDelay.AudioRecorder;
 using AudioDelay.Helpers;
 
+var runtime = System.Runtime.InteropServices.RuntimeInformation.RuntimeIdentifier;
+
+var deviceHandler = new DeviceHandler();
+
 var delayHandler = new DelayHandler(new ThreadHandler());
 
-var arguments = HandleArgs.ParseArgs(args);
+var handleArgs = new HandleArgs(deviceHandler);
+
+var arguments = handleArgs.ParseArgs(args);
 
 if (arguments.Help)
 {
-    Console.Write(HandleArgs.GetHelpText());
+    Console.Write(handleArgs.GetHelpText());
     return 0;
 }
 
 IAudioRecorder recorder;
-
-var runtime = System.Runtime.InteropServices.RuntimeInformation.RuntimeIdentifier;
 
 switch (runtime)
 {
@@ -28,7 +32,7 @@ switch (runtime)
 
 if (arguments.ListDevices)
 {
-    Console.Write(recorder.GetDevices());
+    Console.Write(deviceHandler.GetDevices());
     return 0;
 }
 

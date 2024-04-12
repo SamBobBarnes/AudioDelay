@@ -1,10 +1,10 @@
-﻿namespace AudioDelay.Args;
+﻿using AudioDelay.Helpers;
 
-public class HandleArgs
+namespace AudioDelay.Args;
+
+public class HandleArgs(IDeviceHandler deviceHandler)
 {
-    protected HandleArgs() {}
-
-    public static Arguments ParseArgs(string[] args)
+    public Arguments ParseArgs(string[] args)
     {
         var result = new Arguments();
         var argsList = args.ToList();
@@ -33,17 +33,19 @@ public class HandleArgs
         result.Runtime = contentLength - result.Delay;
         result.Debug = ParseDebug(argsList);
         result.ListDevices = ParseListDevices(argsList);
+        result.InputDevice = ParseInputDevice(argsList);
+        result.OutputDevice = ParseOutputDevice(argsList);
         
         return result;
     }
 
-    protected static bool ParseHelp(List<string> args)
+    protected bool ParseHelp(List<string> args)
     {
         if (args.Contains("-h") || args.Contains("--help")) return true;
         return false;
     }
 
-    protected static int ParseDelay(List<string> args)
+    protected int ParseDelay(List<string> args)
     {
         var delayInt = 5000;
         if (args.Contains("--delay"))
@@ -66,7 +68,7 @@ public class HandleArgs
         return delayInt;
     }
 
-    protected static int ParseContentLength(List<string> args)
+    protected int ParseContentLength(List<string> args)
     {
         var runtimeInt = 5000;
         if (args.Contains("--content-length"))
@@ -89,7 +91,7 @@ public class HandleArgs
         return runtimeInt;
     }
 
-    protected static string ParseTimeFormat(List<string> args)
+    protected string ParseTimeFormat(List<string> args)
     {
         int ms = args.Count(x => x == "--ms");
         int s = args.Count(x => x == "--s");
@@ -108,19 +110,95 @@ public class HandleArgs
         return "ms";
     }
     
-    protected static bool ParseDebug(List<string> args)
+    protected bool ParseDebug(List<string> args)
     {
         if (args.Contains("--debug") || args.Contains("-d")) return true;
         return false;
     }
     
-    protected static bool ParseListDevices(List<string> args)
+    protected bool ParseListDevices(List<string> args)
     {
         if (args.Contains("--devices")) return true;
         return false;
     }
 
-    public static string GetHelpText()
+    protected int ParseInputDevice(List<string> args)
+    {
+        string flagUsed;
+        if (args.Contains("--input-device"))
+        {
+            flagUsed = "--input-device";
+        }
+        else if (args.Contains("-i"))
+        {
+            flagUsed = "-i";
+        }
+        else
+        {
+            return 0;
+        }
+        
+        var index = args.IndexOf(flagUsed);
+        try
+        {
+            var inputDevice = int.Parse(args[index + 1]);
+            var deviceCount = deviceHandler.GetInputDeviceCount();
+            if (inputDevice < 0 || inputDevice > deviceCount) throw new ArgumentOutOfRangeException(nameof(inputDevice),inputDevice.ToString());
+            return inputDevice;
+        }
+        catch (ArgumentOutOfRangeException e)
+        {
+            if(e.ParamName == "inputDevice")
+                throw new ArgumentException($"Invalid input device: {e.Message}");
+            
+            throw new ArgumentException(
+                $"An input following the \"{flagUsed}\" option was not found.\nThe \"{flagUsed}\" option must be followed by a valid integer");
+        }
+        catch (Exception)
+        {
+            throw new ArgumentException($"Error parsing {flagUsed} input. Should be in the format of \"{flagUsed} 1\"");
+        }
+    }
+    
+    protected int ParseOutputDevice(List<string> args)
+    {
+        string flagUsed;
+        if (args.Contains("--output-device"))
+        {
+            flagUsed = "--output-device";
+        }
+        else if (args.Contains("-o"))
+        {
+            flagUsed = "-o";
+        }
+        else
+        {
+            return 0;
+        }
+        
+        var index = args.IndexOf(flagUsed);
+        try
+        {
+            var outputDevice = int.Parse(args[index + 1]);
+            var deviceCount = deviceHandler.GetOutputDeviceCount();
+            if (outputDevice < 0 || outputDevice > deviceCount) throw new ArgumentOutOfRangeException(nameof(outputDevice),outputDevice.ToString());
+            return outputDevice;
+        }
+        catch (ArgumentOutOfRangeException e)
+        {
+            if(e.ParamName == "outputDevice")
+                throw new ArgumentException($"Invalid output device: {e.Message}");
+            
+            throw new ArgumentException(
+                $"An input following the \"{flagUsed}\" option was not found.\nThe \"{flagUsed}\" option must be followed by a valid integer");
+        }
+        catch (Exception)
+        {
+            throw new ArgumentException($"Error parsing {flagUsed} input. Should be in the format of \"{flagUsed} 1\"");
+        }
+    }
+
+    public string GetHelpText()
     {
         return "Audio Delay v1.0.0\n" +
                "This program allows you to record audio and play it back with a delay.\n" +
