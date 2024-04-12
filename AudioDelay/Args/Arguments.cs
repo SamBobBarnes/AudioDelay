@@ -1,4 +1,4 @@
-﻿namespace AudioDelay;
+﻿namespace AudioDelay.Args;
 
 public class Arguments
 {

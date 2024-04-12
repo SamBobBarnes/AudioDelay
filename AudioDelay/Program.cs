@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using AudioDelay;
+using AudioDelay.Args;
+using AudioDelay.AudioRecorder;
 using AudioDelay.Helpers;
 
 var delayHandler = new DelayHandler(new ThreadHandler());
@@ -12,24 +14,24 @@ if (arguments.Help)
     return 0;
 }
 
-AudioRecorderPlayer recorderPlayer = new AudioRecorderPlayer(arguments.RecordingLength);
+AudioRecorder recorder = new AudioRecorder(arguments.RecordingLength);
 
 Console.WriteLine("Starting recording and playback...");
-recorderPlayer.Start();
+recorder.Start();
 
 delayHandler.Wait(arguments.Delay, arguments.Debug);
 
 Console.WriteLine("Starting playback...");
-recorderPlayer.Play();
+recorder.Play();
 
 delayHandler.Wait(arguments.Runtime, arguments.Debug);
 
-recorderPlayer.Stop();
+recorder.Stop();
 Console.WriteLine("Stopped recording.");
 
 delayHandler.Wait(arguments.Delay, arguments.Debug);
 
-recorderPlayer.StopPlayback();
+recorder.StopPlayback();
 Console.WriteLine("Stopped playback.");
 
 return 0;

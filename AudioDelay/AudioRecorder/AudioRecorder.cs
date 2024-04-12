@@ -1,13 +1,13 @@
 ﻿using NAudio.Wave;
 
-namespace AudioDelay;
-public class AudioRecorderPlayer
+namespace AudioDelay.AudioRecorder;
+public class AudioRecorder : IAudioRecorder
 {
     private readonly WaveInEvent _waveIn;
     private readonly WaveOutEvent _waveOut;
     private readonly BufferedWaveProvider _bufferedWaveProvider;
 
-    public AudioRecorderPlayer(int recordingLength)
+    public AudioRecorder(int recordingLength)
     {
         // Set up recording
         _waveIn = new WaveInEvent();
