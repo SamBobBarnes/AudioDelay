@@ -8,6 +8,15 @@ AudioDelay is a C# application that records audio and plays it back after a spec
 - Debug mode for detailed logging.
 - Command-line arguments for easy configuration.
 
+## Installation
+### Unix
+Unix requires libasound2-dev to be installed. You can install it using the following command:
+
+```bash
+sudo apt-get install libasound2-dev
+```
+
+
 ## Usage
 You can configure the application using the following command-line arguments:
 

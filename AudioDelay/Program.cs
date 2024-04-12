@@ -57,4 +57,6 @@ delayHandler.Wait(arguments.Delay, arguments.Debug);
 recorder.StopPlayback();
 Console.WriteLine("Stopped playback.");
 
+recorder.Dispose();
+
 return 0;
