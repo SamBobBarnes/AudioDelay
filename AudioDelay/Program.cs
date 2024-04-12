@@ -25,6 +25,9 @@ switch (runtime)
     case "win-x64":
         recorder = new WindowsAudioRecorder(arguments);
         break;
+    case "linux-x64":
+        recorder = new LinuxAudioRecorder(arguments);
+        break;
     default:
         Console.WriteLine("Unsupported OS.");
         return 1;
