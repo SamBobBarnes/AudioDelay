@@ -2,11 +2,6 @@
 
 on:
   pull_request:
-    branches:
-      - '**'
-    paths:
-      - 'AudioDelay/**'
-      - 'Tests/**'
 
 jobs:
   test:
@@ -29,3 +24,34 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --verbosity normal
+        
+  run:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
+          
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.0.x'
+          
+      - name: Restore dependencies
+        run: dotnet restore
+        
+      - name: Build
+        run: dotnet build --no-restore
+        
+      - name: Run
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            ./AudioDelay/bin/Debug/net8.0/AudioDelay.exe
+          else
+            ./AudioDelay/bin/Debug/net8.0/AudioDelay
+          fi

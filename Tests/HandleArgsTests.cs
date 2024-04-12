@@ -1,10 +1,14 @@
 ﻿using AudioDelay;
+using AudioDelay.Args;
+using AudioDelay.Helpers;
 using FluentAssertions;
+using NSubstitute;
 
 namespace Tests;
 
-public class HandleArgsTests : HandleArgs
+public class HandleArgsTests() : HandleArgs(_deviceHandler)
 {
+    private static readonly IDeviceHandler _deviceHandler = Substitute.For<IDeviceHandler>();
 
     #region HandleHelp
 
@@ -69,7 +73,7 @@ public class HandleArgsTests : HandleArgs
 
         Action act = () => ParseDelay(args);
 
-        act.Should().Throw<Exception>().WithMessage("An input following the \"--delay\" option was not found.\nThe \"--delay\" option must be followed by a valid integer");
+        act.Should().Throw<ArgumentException>().WithMessage("An input following the \"--delay\" option was not found.\nThe \"--delay\" option must be followed by a valid integer");
     }
     
     [Fact]
@@ -79,7 +83,7 @@ public class HandleArgsTests : HandleArgs
 
         Action act = () => ParseDelay(args);
 
-        act.Should().Throw<Exception>().WithMessage("Error parsing --delay input. Should be in the format of \"--delay 5000\"");
+        act.Should().Throw<ArgumentException>().WithMessage("Error parsing --delay input. Should be in the format of \"--delay 5000\"");
     }
     
     #endregion
@@ -113,7 +117,7 @@ public class HandleArgsTests : HandleArgs
 
         Action act = () => ParseContentLength(args);
 
-        act.Should().Throw<Exception>().WithMessage("An input following the \"--content-length\" option was not found.\nThe \"--content-length\" option must be followed by a valid integer");
+        act.Should().Throw<ArgumentException>().WithMessage("An input following the \"--content-length\" option was not found.\nThe \"--content-length\" option must be followed by a valid integer");
     }
     
     [Fact]
@@ -123,7 +127,7 @@ public class HandleArgsTests : HandleArgs
 
         Action act = () => ParseContentLength(args);
 
-        act.Should().Throw<Exception>().WithMessage("Error parsing --content-length input. Should be in the format of \"--content-length 5000\"");
+        act.Should().Throw<ArgumentException>().WithMessage("Error parsing --content-length input. Should be in the format of \"--content-length 5000\"");
     }
     
     #endregion
@@ -188,7 +192,7 @@ public class HandleArgsTests : HandleArgs
 
         Action act = () => ParseTimeFormat(args);
 
-        act.Should().Throw<Exception>().WithMessage("Only one time format flag can be used at a time");
+        act.Should().Throw<ArgumentException>().WithMessage("Only one time format flag can be used at a time");
     }
     
     #endregion
@@ -227,6 +231,176 @@ public class HandleArgsTests : HandleArgs
     
     #endregion
     
+    #region ParseListDevices
+    
+    [Fact]
+    public void ParseListDevices_ShouldReturnFalseByDefault()
+    {
+        var args = new List<string>();
+
+        var actual = ParseListDevices(args);
+
+        actual.Should().BeFalse();
+    }
+    
+    [Fact]
+    public void ParseListDevices_ShouldReturnTrueWhenDevicesFlagIsPresent()
+    {
+        var args = new List<string> { "--devices" };
+
+        var actual = ParseListDevices(args);
+
+        actual.Should().BeTrue();
+    }
+    
+    #endregion
+    
+    #region ParseInputDevice
+
+    [Fact]
+    public void ParseInputDevice_ShouldReturnZeroByDefault()
+    {
+        var args = new List<string>();
+        _deviceHandler.GetInputDeviceCount().Returns(1);
+        
+        var actual = ParseInputDevice(args);
+        
+        actual.Should().Be(0);
+    }
+    
+    [Fact]
+    public void ParseInputDevice_ShouldReturnInputWhenInputDeviceFlagIsPresent()
+    {
+        var args = new List<string> { "--input-device", "1" };
+        _deviceHandler.GetInputDeviceCount().Returns(1);
+        
+        var actual = ParseInputDevice(args);
+        
+        actual.Should().Be(1);
+    }
+
+    [Fact]
+    public void ParseInputDevice_ShouldReturnInputWhenInputDeviceFlagIsPresent_Short()
+    {
+        var args = new List<string> { "-i", "1" };
+        _deviceHandler.GetInputDeviceCount().Returns(1);
+
+        var actual = ParseInputDevice(args);
+
+        actual.Should().Be(1);
+    }
+
+    [Theory]
+    [CombinatorialData]
+    public void ParseInputDevice_ShouldThrowOutOfRangeExceptionWhenInputIsNotACurrentDevice([CombinatorialValues(-1, 2)] int device)
+    {
+        var args = new List<string> { "--input-device", device.ToString() };
+        _deviceHandler.GetInputDeviceCount().Returns(1);
+
+        Action act = () => ParseInputDevice(args);
+
+        act.Should().Throw<ArgumentException>().WithMessage($"Invalid input device: {device.ToString()} (Parameter 'inputDevice')");
+    }
+    
+    [Theory]
+    [InlineData("--input-device")]
+    [InlineData("-i")]
+    public void ParseInputDevice_ShouldThrowExceptionWhenInputIsMissing(string flag)
+    {
+        var args = new List<string> { flag };
+        
+        Action act = () => ParseInputDevice(args);
+        
+        act.Should().Throw<ArgumentException>().WithMessage($"An input following the \"{flag}\" option was not found.\nThe \"{flag}\" option must be followed by a valid integer");
+    }
+
+    [Theory]
+    [InlineData("--input-device")]
+    [InlineData("-i")]
+    public void ParseInputDevice_ShouldThrowExceptionWhenInputIsNotAnInteger(string flag)
+    {
+        var args = new List<string> { flag, "two" };
+        
+        Action act = () => ParseInputDevice(args);
+        
+        act.Should().Throw<ArgumentException>().WithMessage($"Error parsing {flag} input. Should be in the format of \"{flag} 1\"");
+    }
+    
+    #endregion
+    
+    #region ParseOutputDevice
+    
+    [Fact]
+    public void ParseOutputDevice_ShouldReturnZeroByDefault()
+    {
+        var args = new List<string>();
+        _deviceHandler.GetOutputDeviceCount().Returns(1);
+        
+        var actual = ParseOutputDevice(args);
+        
+        actual.Should().Be(0);
+    }
+    
+    [Fact]
+    public void ParseOutputDevice_ShouldReturnInputWhenOutputDeviceFlagIsPresent()
+    {
+        var args = new List<string> { "--output-device", "1" };
+        _deviceHandler.GetOutputDeviceCount().Returns(1);
+        
+        var actual = ParseOutputDevice(args);
+        
+        actual.Should().Be(1);
+    }
+    
+    [Fact]
+    public void ParseOutputDevice_ShouldReturnInputWhenOutputDeviceFlagIsPresent_Short()
+    {
+        var args = new List<string> { "-o", "1" };
+        _deviceHandler.GetOutputDeviceCount().Returns(1);
+        
+        var actual = ParseOutputDevice(args);
+        
+        actual.Should().Be(1);
+    }
+    
+    [Theory]
+    [CombinatorialData]
+    public void ParseOutputDevice_ShouldThrowOutOfRangeExceptionWhenInputIsNotACurrentDevice([CombinatorialValues(-1, 1)] int device)
+    {
+        var args = new List<string> { "--output-device", device.ToString() };
+        _deviceHandler.GetOutputDeviceCount().Returns(1);
+        
+        Action act = () => ParseOutputDevice(args);
+        
+        act.Should().Throw<ArgumentException>().WithMessage($"Invalid output device: {device.ToString()} (Parameter 'outputDevice')");
+    }
+    
+    [Theory]
+    [InlineData("--output-device")]
+    [InlineData("-o")]
+    public void ParseOutputDevice_ShouldThrowExceptionWhenInputIsMissing(string flag)
+    {
+        var args = new List<string> { flag };
+        
+        Action act = () => ParseOutputDevice(args);
+        
+        act.Should().Throw<ArgumentException>().WithMessage($"An input following the \"{flag}\" option was not found.\nThe \"{flag}\" option must be followed by a valid integer");
+    }
+    
+    [Theory]
+    [InlineData("--output-device")]
+    [InlineData("-o")]
+    public void ParseOutputDevice_ShouldThrowExceptionWhenInputIsNotAnInteger(string flag)
+    {
+        var args = new List<string> { flag, "two" };
+        
+        Action act = () => ParseOutputDevice(args);
+        
+        act.Should().Throw<ArgumentException>().WithMessage($"Error parsing {flag} input. Should be in the format of \"{flag} 1\"");
+    }
+    
+    #endregion
+    
     #region ParseArgs
     
     [Fact]
@@ -242,11 +416,14 @@ public class HandleArgsTests : HandleArgs
     [Fact]
     public void ParseArgs_ShouldReturnValuesWhenArgsArePassed()
     {
-        var args = new[] { "--delay", "2000", "--content-length", "3000", "--help", "--debug" };
+        _deviceHandler.GetInputDeviceCount().Returns(3);
+        _deviceHandler.GetOutputDeviceCount().Returns(3);
+        
+        var args = new[] { "--delay", "2000", "--content-length", "3000", "--help", "--debug", "--input-device", "1", "--output-device", "2", "--devices" };
 
         var actual = ParseArgs(args);
 
-        actual.Should().BeEquivalentTo(new Arguments{Delay = 2000, Runtime = 1000, Help = true, Debug = true});
+        actual.Should().BeEquivalentTo(new Arguments{Delay = 2000, Runtime = 1000, Help = true, Debug = true, InputDevice = 1, OutputDevice = 2, ListDevices = true});
     }
     
     [Theory]
@@ -270,7 +447,7 @@ public class HandleArgsTests : HandleArgs
 
         Action act = () => ParseArgs(args);
 
-        act.Should().Throw<Exception>().WithMessage("Content length must be greater or equal to than the delay.");
+        act.Should().Throw<ArgumentException>().WithMessage("Content length must be greater or equal to than the delay.");
     }
     
     #endregion
