@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using NAudio.CoreAudioApi;
+using NAudio.Wave;
 
 namespace AudioDelay.AudioRecorder;
 public class WindowsAudioRecorder : IAudioRecorder
@@ -41,6 +42,16 @@ public class WindowsAudioRecorder : IAudioRecorder
     public void Stop()
     {
         _waveIn.StopRecording();
+    }
+
+    public void GetDevices()
+    {
+        var enumerator = new MMDeviceEnumerator();
+        foreach (var endpoint in
+                 enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
+        {
+            Console.WriteLine("{0} ({1})", endpoint.FriendlyName, endpoint.ID);
+        }
     }
 
     private void OnDataAvailable(object sender, WaveInEventArgs e)
