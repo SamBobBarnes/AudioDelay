@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using PortAudioSharp;
 
 namespace AudioDelay.Helpers;
 
@@ -104,7 +105,19 @@ public class DeviceHandler : IDeviceHandler
     
     private string GetLinuxDevices()
     {
-        throw new NotImplementedException();
+        var stringBuilder = new StringBuilder();
+        
+        PortAudio.Initialize();
+        
+        var deviceCount = PortAudio.DeviceCount;
+        
+        for (var i = 0; i < deviceCount; i++)
+        {
+            var deviceInfo = PortAudio.GetDeviceInfo(i);
+            stringBuilder.AppendLine($"{i}: {deviceInfo.name}");
+        }
+        
+        return stringBuilder.ToString();
     }
     
     private int GetLinuxInputDeviceCount()

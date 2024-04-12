@@ -1,4 +1,5 @@
 ﻿using AudioDelay.Args;
+using PortAudioSharp;
 
 namespace AudioDelay.AudioRecorder;
 
@@ -6,6 +7,7 @@ public class LinuxAudioRecorder: AudioRecorder
 {
     public LinuxAudioRecorder(Arguments args) : base(args)
     {
+        
     }
 
     public override void Play()
