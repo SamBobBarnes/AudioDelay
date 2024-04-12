@@ -228,6 +228,30 @@ public class HandleArgsTests : HandleArgs
     
     #endregion
     
+    #region ParseListDevices
+    
+    [Fact]
+    public void ParseListDevices_ShouldReturnFalseByDefault()
+    {
+        var args = new List<string>();
+
+        var actual = ParseListDevices(args);
+
+        actual.Should().BeFalse();
+    }
+    
+    [Fact]
+    public void ParseListDevices_ShouldReturnTrueWhenDevicesFlagIsPresent()
+    {
+        var args = new List<string> { "--devices" };
+
+        var actual = ParseListDevices(args);
+
+        actual.Should().BeTrue();
+    }
+    
+    #endregion
+    
     #region ParseArgs
     
     [Fact]

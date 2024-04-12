@@ -32,6 +32,7 @@ public class HandleArgs
         if(contentLength < result.Delay) throw new ArgumentException("Content length must be greater or equal to than the delay.");
         result.Runtime = contentLength - result.Delay;
         result.Debug = ParseDebug(argsList);
+        result.ListDevices = ParseListDevices(argsList);
         
         return result;
     }
@@ -110,6 +111,12 @@ public class HandleArgs
     protected static bool ParseDebug(List<string> args)
     {
         if (args.Contains("--debug") || args.Contains("-d")) return true;
+        return false;
+    }
+    
+    protected static bool ParseListDevices(List<string> args)
+    {
+        if (args.Contains("--devices")) return true;
         return false;
     }
 
