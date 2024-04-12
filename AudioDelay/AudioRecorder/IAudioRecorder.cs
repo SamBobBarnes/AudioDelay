@@ -6,5 +6,5 @@ public interface IAudioRecorder
   void StopPlayback();
   void Start();
   void Stop();
-  void GetDevices();
+  string GetDevices();
 }

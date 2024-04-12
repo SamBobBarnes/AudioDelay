@@ -1,4 +1,5 @@
-﻿using NAudio.CoreAudioApi;
+﻿using System.Text;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 
 namespace AudioDelay.AudioRecorder;
@@ -44,14 +45,35 @@ public class WindowsAudioRecorder : IAudioRecorder
         _waveIn.StopRecording();
     }
 
-    public void GetDevices()
+    public string GetDevices()
     {
         var enumerator = new MMDeviceEnumerator();
+        var stringBuilder = new StringBuilder();
+        
+        var i = 1;
+
+        stringBuilder.AppendLine("Input devices:");
+        stringBuilder.AppendLine("0: Primary Input Device (Default)");
         foreach (var endpoint in
                  enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
         {
-            Console.WriteLine("{0} ({1})", endpoint.FriendlyName, endpoint.ID);
+            stringBuilder.AppendLine($"{i}: {endpoint.FriendlyName}");
+            i++;
         }
+        
+        i = 1;
+        
+        stringBuilder.AppendLine();
+        stringBuilder.AppendLine("Playback devices:");
+        stringBuilder.AppendLine("0: Primary Output Device (Default)");
+        foreach (var endpoint in
+                 enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
+        {
+            stringBuilder.AppendLine($"{i}: {endpoint.FriendlyName}");
+            i++;
+        }
+        
+        return stringBuilder.ToString();
     }
 
     private void OnDataAvailable(object sender, WaveInEventArgs e)

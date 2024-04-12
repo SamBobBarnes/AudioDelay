@@ -26,6 +26,12 @@ switch (runtime)
         return 1;
 }
 
+if (arguments.ListDevices)
+{
+    Console.Write(recorder.GetDevices());
+    return 0;
+}
+
 Console.WriteLine("Starting recording and playback...");
 recorder.Start();
 
