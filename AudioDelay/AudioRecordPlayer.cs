@@ -3,48 +3,48 @@
 namespace AudioDelay;
 public class AudioRecorderPlayer
 {
-    private WaveInEvent waveIn;
-    private WaveOutEvent waveOut;
-    private BufferedWaveProvider bufferedWaveProvider;
+    private readonly WaveInEvent _waveIn;
+    private readonly WaveOutEvent _waveOut;
+    private readonly BufferedWaveProvider _bufferedWaveProvider;
 
     public AudioRecorderPlayer(int recordingLength)
     {
         // Set up recording
-        waveIn = new WaveInEvent();
-        waveIn.DataAvailable += OnDataAvailable!;
-        waveIn.WaveFormat = new WaveFormat(44100, 1); // CD quality audio, mono channel
+        _waveIn = new WaveInEvent();
+        _waveIn.DataAvailable += OnDataAvailable!;
+        _waveIn.WaveFormat = new WaveFormat(44100, 1); // CD quality audio, mono channel
 
         // Set up playback
-        waveOut = new WaveOutEvent();
-        bufferedWaveProvider = new BufferedWaveProvider(waveIn.WaveFormat)
+        _waveOut = new WaveOutEvent();
+        _bufferedWaveProvider = new BufferedWaveProvider(_waveIn.WaveFormat)
         {
             BufferDuration = TimeSpan.FromMilliseconds(recordingLength)
         };
-        waveOut.Init(bufferedWaveProvider);
+        _waveOut.Init(_bufferedWaveProvider);
     }
 
     public void Play()
     {
-        waveOut.Play();
+        _waveOut.Play();
     }
 
     public void StopPlayback()
     {
-        waveOut.Stop();
+        _waveOut.Stop();
     }
     
     public void Start()
     {
-        waveIn.StartRecording();
+        _waveIn.StartRecording();
     }
 
     public void Stop()
     {
-        waveIn.StopRecording();
+        _waveIn.StopRecording();
     }
 
     private void OnDataAvailable(object sender, WaveInEventArgs e)
     {
-        bufferedWaveProvider.AddSamples(e.Buffer, 0, e.BytesRecorded);
+        _bufferedWaveProvider.AddSamples(e.Buffer, 0, e.BytesRecorded);
     }
 }
