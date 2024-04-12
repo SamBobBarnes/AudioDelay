@@ -21,6 +21,8 @@ public class DeviceHandler : IDeviceHandler
         {
             case "win-x64":
                 return GetWindowsInputDeviceCount();
+            case "linux-x64":
+                return GetLinuxInputDeviceCount();
             default:
                 return -1;
         }
@@ -32,6 +34,8 @@ public class DeviceHandler : IDeviceHandler
         {
             case "win-x64":
                 return GetWindowsOutputDeviceCount();
+            case "linux-x64":
+                return GetLinuxOutputDeviceCount();
             default:
                 return -1;
         }
@@ -43,6 +47,8 @@ public class DeviceHandler : IDeviceHandler
         {
             case "win-x64":
                 return GetWindowsDevices();
+            case "linux-x64":
+                return GetLinuxDevices();
             default:
                 return "No devices available for this runtime.";
         }
@@ -90,6 +96,25 @@ public class DeviceHandler : IDeviceHandler
         var enumerator = new MMDeviceEnumerator();
 
         return enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active).Count;
+    }
+    
+    #endregion
+    
+    #region Linux
+    
+    private string GetLinuxDevices()
+    {
+        throw new NotImplementedException();
+    }
+    
+    private int GetLinuxInputDeviceCount()
+    {
+        throw new NotImplementedException();
+    }
+    
+    private int GetLinuxOutputDeviceCount()
+    {
+        throw new NotImplementedException();
     }
     
     #endregion
