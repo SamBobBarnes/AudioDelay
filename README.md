@@ -14,6 +14,7 @@ Unix requires libasound2-dev to be installed. You can install it using the follo
 
 ```bash
 sudo apt-get install libasound2-dev
+sudo apt install alsa-utils
 ```
 
 
