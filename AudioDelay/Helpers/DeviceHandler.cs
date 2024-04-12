@@ -114,8 +114,15 @@ public class DeviceHandler : IDeviceHandler
         for (var i = 0; i < deviceCount; i++)
         {
             var deviceInfo = PortAudio.GetDeviceInfo(i);
-            stringBuilder.AppendLine($"{i}: {deviceInfo.name}");
+            var inOut = deviceInfo.maxInputChannels > 0 ? "Input" : "Output";
+            stringBuilder.AppendLine($"{i}: {deviceInfo.name} ({inOut})");
         }
+        
+        stringBuilder.AppendLine();
+        stringBuilder.AppendLine($"0: Primary Output Device {PortAudio.DefaultOutputDevice}");
+        stringBuilder.AppendLine($"1: Primary Input Device {PortAudio.DefaultInputDevice}");
+        
+        PortAudio.Terminate();
         
         return stringBuilder.ToString();
     }
