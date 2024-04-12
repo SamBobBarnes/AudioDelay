@@ -29,7 +29,7 @@ public class HandleArgs
         
         result.Delay = ParseDelay(argsList) * multiplier;
         var contentLength = ParseContentLength(argsList) * multiplier;
-        if(contentLength < result.Delay) throw new Exception("Content length must be greater or equal to than the delay.");
+        if(contentLength < result.Delay) throw new ArgumentException("Content length must be greater or equal to than the delay.");
         result.Runtime = contentLength - result.Delay;
         result.Debug = ParseDebug(argsList);
         
@@ -54,11 +54,11 @@ public class HandleArgs
             }
             catch (ArgumentOutOfRangeException)
             {
-                throw new Exception("An input following the \"--delay\" option was not found.\nThe \"--delay\" option must be followed by a valid integer");
+                throw new ArgumentException("An input following the \"--delay\" option was not found.\nThe \"--delay\" option must be followed by a valid integer");
             }
             catch (Exception)
             {
-                throw new Exception("Error parsing --delay input. Should be in the format of \"--delay 5000\"");
+                throw new ArgumentException("Error parsing --delay input. Should be in the format of \"--delay 5000\"");
             } 
         }
 
@@ -77,11 +77,11 @@ public class HandleArgs
             }
             catch (ArgumentOutOfRangeException)
             {
-                throw new Exception("An input following the \"--content-length\" option was not found.\nThe \"--content-length\" option must be followed by a valid integer");
+                throw new ArgumentException("An input following the \"--content-length\" option was not found.\nThe \"--content-length\" option must be followed by a valid integer");
             }
             catch (Exception)
             {
-                throw new Exception("Error parsing --content-length input. Should be in the format of \"--content-length 5000\"");
+                throw new ArgumentException("Error parsing --content-length input. Should be in the format of \"--content-length 5000\"");
             } 
         }
 
@@ -97,7 +97,7 @@ public class HandleArgs
         
         var totalFlags = ms + s + m + h;
         
-        if (totalFlags > 1) throw new Exception("Only one time format flag can be used at a time");
+        if (totalFlags > 1) throw new ArgumentException("Only one time format flag can be used at a time");
         
         if (ms==1) return "ms";
         if (s==1) return "s";
