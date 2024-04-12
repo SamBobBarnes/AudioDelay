@@ -12,13 +12,11 @@ public class WindowsAudioRecorder : IAudioRecorder
     {
         // Set up recording
         _waveIn = new WaveInEvent();
-        _waveIn.DeviceNumber = args.InputDevice-1;
         _waveIn.DataAvailable += OnDataAvailable!;
         _waveIn.WaveFormat = new WaveFormat(44100, 1); // CD quality audio, mono channel
 
         // Set up playback
         _waveOut = new WaveOutEvent();
-        _waveOut.DeviceNumber = args.OutputDevice;
         _bufferedWaveProvider = new BufferedWaveProvider(_waveIn.WaveFormat)
         {
             BufferDuration = TimeSpan.FromMilliseconds(args.RecordingLength),
