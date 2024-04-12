@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using AudioDelay;
-using AudioDelay.Args;
+﻿using AudioDelay.Args;
 using AudioDelay.AudioRecorder;
 using AudioDelay.Helpers;
 
@@ -14,7 +12,19 @@ if (arguments.Help)
     return 0;
 }
 
-AudioRecorder recorder = new AudioRecorder(arguments.RecordingLength);
+IAudioRecorder recorder;
+
+var runtime = System.Runtime.InteropServices.RuntimeInformation.RuntimeIdentifier;
+
+switch (runtime)
+{
+    case "win-x64":
+        recorder = new WindowsAudioRecorder(arguments.RecordingLength);
+        break;
+    default:
+        Console.WriteLine("Unsupported OS.");
+        return 1;
+}
 
 Console.WriteLine("Starting recording and playback...");
 recorder.Start();
