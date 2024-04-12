@@ -48,6 +48,7 @@ jobs:
         run: dotnet build --no-restore
         
       - name: Run
+        shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             ./AudioDelay/bin/Debug/net8.0/AudioDelay.exe
