@@ -1,4 +1,6 @@
+import Args.Arguments;
 import AudioRecorder.CapturePlayback;
+import AudioRecorder.WindowsAudioRecorder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,28 +15,62 @@ public class Main {
     }
 
     private static void console() {
-        CapturePlayback capturePlayback = new CapturePlayback();
+//        CapturePlayback capturePlayback = new CapturePlayback();
+//
+//        capturePlayback.record();
+//        System.out.println("recording...");
+//
+//        //delay 5 seconds
+//        try {
+//            Thread.sleep(10000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//        System.out.println("recording stopped");
+//        capturePlayback.stopRecording();
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println("Playing...");
+//        capturePlayback.playback();
+        var args = new Arguments();
+        args.Delay = 1000;
+        args.Runtime = 5000;
+        var recorder = new WindowsAudioRecorder(args);
 
-        capturePlayback.record();
-        System.out.println("recording...");
+        System.out.println("Recording...");
+        recorder.Start();
 
-        //delay 5 seconds
         try {
-            Thread.sleep(10000);
+            Thread.sleep(args.Delay);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-
-        System.out.println("recording stopped");
-        capturePlayback.stopRecording();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         System.out.println("Playing...");
-        capturePlayback.playback();
+        recorder.Play();
+
+        try {
+            Thread.sleep(args.Runtime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        recorder.Stop();
+        System.out.println("Recording stopped.");
+
+        try {
+            Thread.sleep(args.Delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        recorder.StopPlayback();
+        System.out.println("Playback stopped.");
     }
 
     private static void window() {
