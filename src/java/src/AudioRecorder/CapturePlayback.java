@@ -125,6 +125,29 @@ public class CapturePlayback extends JPanel implements ActionListener, ControlCo
         add(p1);
     }
 
+    public void record() {
+        file = null;
+        capture.start();
+        fileName = "untitled";
+        samplingGraph.start();
+    }
+
+    public void stopRecording() {
+        lines.removeAllElements();
+        capture.stop();
+        samplingGraph.stop();
+    }
+
+    public void playback() {
+        playback.start();
+        samplingGraph.start();
+    }
+
+    public void stopPlayback() {
+        playback.stop();
+        samplingGraph.stop();
+    }
+
 
     public void open() { }
 
@@ -733,8 +756,8 @@ public class CapturePlayback extends JPanel implements ActionListener, ControlCo
             }
 
             Dimension d = getSize();
-            int w = d.width;
-            int h = d.height-15;
+            int w = d.width <= 0 ? 100 : d.width;
+            int h = d.height-15 <= 0 ? 100 : d.height-15;
             int[] audioData = null;
             if (format.getSampleSizeInBits() == 16) {
                 int nlengthInSamples = audioBytes.length / 2;
@@ -890,24 +913,4 @@ public class CapturePlayback extends JPanel implements ActionListener, ControlCo
             repaint();
         }
     } // End class SamplingGraph
-
-
-
-
-    public static void main(String s[]) {
-        CapturePlayback capturePlayback = new CapturePlayback();
-        capturePlayback.open();
-        JFrame f = new JFrame("Capture/Playback");
-        f.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) { System.exit(0); }
-        });
-        f.getContentPane().add("Center", capturePlayback);
-        f.pack();
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int w = 720;
-        int h = 340;
-        f.setLocation(screenSize.width/2 - w/2, screenSize.height/2 - h/2);
-        f.setSize(w, h);
-        f.show();
-    }
 }
