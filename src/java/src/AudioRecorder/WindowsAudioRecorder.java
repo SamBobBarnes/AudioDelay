@@ -13,6 +13,12 @@ public class WindowsAudioRecorder extends AudioRecorder
     Capture capture;
     Playback playback;
     AudioFormat format;
+    Thread recordingThread;
+    Thread playbackThread;
+
+    SourceDataLine sourceLine;
+    TargetDataLine targetLine;
+
     byte[] buffer;
     int bufferLengthInBytes;
 
@@ -33,32 +39,67 @@ public class WindowsAudioRecorder extends AudioRecorder
         format = new AudioFormat(encoding, rate, sampleSizeInBits, channels, frameSize, rate, bigEndian);
         bufferLengthInBytes = (int)(_args.getRecordingLength() * rate * frameSize / 1000);
         length = bufferLengthInBytes / format.getFrameSize();
+        buffer = new byte[bufferLengthInBytes];
         //endregion
+
+        try {
+            DataLine.Info sourceInfo = new DataLine.Info(SourceDataLine.class, format);
+            DataLine.Info targetInfo = new DataLine.Info(TargetDataLine.class, format);
+
+            sourceLine = (SourceDataLine) AudioSystem.getLine(sourceInfo);
+            sourceLine.open(format, bufferLengthInBytes);
+            sourceLine.start();
+
+            targetLine = (TargetDataLine) AudioSystem.getLine(targetInfo);
+            targetLine.open(format, targetLine.getBufferSize());
+            targetLine.start();
+
+            recordingThread = new Thread(() -> {
+                System.out.println("Recording... inside thread");
+                while (true) {
+                    sourceLine.write(buffer, 0, buffer.length);
+                }
+            });
+
+            playbackThread = new Thread(() -> {
+                System.out.println("Playing... inside thread");
+                int numBytesRead;
+                while (true) {
+                    numBytesRead = targetLine.read(buffer, 0, buffer.length);
+                    if (numBytesRead == -1) break;
+                }
+            });
+        } catch (Exception e) {
+            System.err.println(e);
+        }
     }
 
     public void Play()
     {
-        playback.start();
+        playbackThread.start();
     }
 
     public void StopPlayback()
     {
-        playback.stop();
+        playbackThread.interrupt();
+        targetLine.drain();
+        targetLine.stop();
+        targetLine.close();
+        targetLine = null;
     }
 
     public void Start()
     {
-
-
-
-        buffer = new byte[bufferLengthInBytes];
-
-        capture.start();
+        recordingThread.start();
     }
 
     public void Stop()
     {
-        capture.stop();
+        recordingThread.interrupt();
+        sourceLine.drain();
+        sourceLine.stop();
+        sourceLine.close();
+        sourceLine = null;
     }
 
     class Capture implements Runnable {
