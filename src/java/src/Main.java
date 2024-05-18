@@ -1,5 +1,6 @@
 import Args.Arguments;
 import AudioRecorder.CapturePlayback;
+import AudioRecorder.TestAudioRecorder;
 import AudioRecorder.WindowsAudioRecorder;
 
 import javax.swing.*;
@@ -40,19 +41,22 @@ public class Main {
         var args = new Arguments();
         args.Delay = 1000;
         args.Runtime = 5000;
-        var recorder = new WindowsAudioRecorder(args);
+//        var recorder = new WindowsAudioRecorder(args);
 
-        System.out.println("Recording...");
-        recorder.Start();
+        var recorder = new TestAudioRecorder(args);
 
+//        System.out.println("Recording...");
+//        recorder.Start();
+        recorder.startCapture();
         try {
             Thread.sleep(args.Delay);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        System.out.println("Playing...");
-        recorder.Play();
+//        System.out.println("Playing...");
+//        recorder.Play();
+        recorder.startPlayback();
 
         try {
             Thread.sleep(args.Runtime);
@@ -60,8 +64,9 @@ public class Main {
             e.printStackTrace();
         }
 
-        recorder.Stop();
-        System.out.println("Recording stopped.");
+//        recorder.Stop();
+//        System.out.println("Recording stopped.");
+        recorder.stopCapture();
 
         try {
             Thread.sleep(args.Delay);
@@ -69,8 +74,9 @@ public class Main {
             e.printStackTrace();
         }
 
-        recorder.StopPlayback();
-        System.out.println("Playback stopped.");
+//        recorder.StopPlayback();
+//        System.out.println("Playback stopped.");
+        recorder.stopPlayback();
     }
 
     private static void window() {
