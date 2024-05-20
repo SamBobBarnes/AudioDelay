@@ -65,7 +65,7 @@ public class Main {
         }
 
 //        recorder.Stop();
-//        System.out.println("Recording stopped.");
+        System.out.println("Recording stopped.");
         recorder.stopCapture();
 
         try {
@@ -75,7 +75,7 @@ public class Main {
         }
 
 //        recorder.StopPlayback();
-//        System.out.println("Playback stopped.");
+        System.out.println("Playback stopped.");
         recorder.stopPlayback();
     }
 
