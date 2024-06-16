@@ -4,5 +4,5 @@
 **/bin
 **/obj
 **/publish
-
+**/out
 **.DotSettings.user
