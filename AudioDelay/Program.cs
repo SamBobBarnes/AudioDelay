@@ -3,16 +3,6 @@ using AudioDelay.Args;
 using AudioDelay.AudioRecorder;
 using AudioDelay.Helpers;
 using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.Grafana.Loki;
-
-Log.Logger = new LoggerConfiguration()
-  .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-  .Enrich.FromLogContext()
-  .Enrich.WithProperty("Application", "AudioDelay")
-  .WriteTo.Console()
-  .WriteTo.GrafanaLoki("http://localhost:3100", [new LokiLabel { Key = "app", Value = "AudioDelay" }])
-  .CreateLogger();
 
 var runtime = RuntimeInformation.RuntimeIdentifier;
 
@@ -29,6 +19,8 @@ if (arguments.Help)
   Console.Write(handleArgs.GetHelpText());
   return 0;
 }
+
+Log.Logger = LoggerConfigurator.ConfigureLogger(arguments).CreateLogger();
 
 AudioRecorder recorder;
 
