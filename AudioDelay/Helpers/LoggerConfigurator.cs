@@ -19,11 +19,12 @@ public class LoggerConfigurator
       .WriteTo.Console();
 
     if (arguments.LoggerName == ValidLoggers.Loki)
-      configuration.WriteTo.GrafanaLoki(arguments.LoggerUrl, [new LokiLabel { Key = "app", Value = "AudioDelay" }]);
+      configuration.WriteTo.GrafanaLoki(arguments.LoggerUrl!.ToString(),
+        [new LokiLabel { Key = "app", Value = "AudioDelay" }]);
 
     if (arguments.LoggerName == ValidLoggers.Elasticsearch)
     {
-      configuration.WriteTo.Elasticsearch([new Uri(arguments.LoggerUrl)],
+      configuration.WriteTo.Elasticsearch([arguments.LoggerUrl!],
         opts =>
         {
           opts.DataStream = new DataStreamName("logs", "dotnet", "audio-delay");

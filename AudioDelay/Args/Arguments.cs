@@ -11,7 +11,7 @@ public class Arguments
   public int InputDevice { get; set; } = 0;
   public int OutputDevice { get; set; } = 0;
   public string LoggerName { get; set; } = "";
-  public string LoggerUrl { get; set; } = "";
+  public Uri? LoggerUrl { get; set; }
 }
 
 public static class ValidLoggers
