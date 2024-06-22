@@ -37,6 +37,7 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     result.ListDevices = ParseListDevices(argsList);
     result.InputDevice = ParseInputDevice(argsList);
     result.OutputDevice = ParseOutputDevice(argsList);
+    (result.LoggerName, result.LoggerUrl) = ParseLoggers(argsList);
 
     return result;
   }
