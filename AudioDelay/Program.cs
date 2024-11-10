@@ -42,7 +42,7 @@ if (arguments.ListDevices)
 
 try
 {
-  Log.Information("Starting recording and playback...");
+  Log.Information("Starting recording...");
   recorder.Start();
 
   delayHandler.Wait(arguments.Delay, arguments.Debug);
