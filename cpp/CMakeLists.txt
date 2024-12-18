@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.30)
 project(cpp)
 
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
+set(CMAKE_PREFIX_PATH /Users/sbarnes/.vcpkg-clion/vcpkg/installed/arm64-osx CACHE STRING "")
 
 find_package(portaudio CONFIG REQUIRED)
-target_link_libraries(main PRIVATE portaudio_static)
 
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(cpp main.cpp)
+
+target_link_libraries(cpp PRIVATE portaudio_static)
