@@ -22,21 +22,15 @@ if (arguments.Help)
 
 Log.Logger = LoggerConfigurator.ConfigureLogger(arguments).CreateLogger();
 
-AudioRecorder recorder;
+AudioRecorder recorder = new PortAudioRecorder(arguments);
 
-switch (runtime)
-{
-  case "win-x64":
-    recorder = new WindowsAudioRecorder(arguments);
-    break;
-  default:
-    Console.WriteLine("Unsupported OS.");
-    return 1;
-}
+PortAudioHelper.PrintDefaultDevices();
+
+return 0;
 
 if (arguments.ListDevices)
 {
-  Console.Write(deviceHandler.GetDevices());
+  PortAudioHelper.PrintDevices();
   return 0;
 }
 
