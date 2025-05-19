@@ -17,7 +17,7 @@ public class PortAudioRecorder : AudioRecorder
 
     #region Input
 
-    var inputParams = new StreamParameters
+    var inputParams = new StreamParameters //TODO: allow for non default devices 
     {
       device = PortAudio.DefaultInputDevice,
       channelCount = 1, // Mono
