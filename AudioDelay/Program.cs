@@ -30,34 +30,34 @@ if (arguments.ListDevices)
   return 0;
 }
 
-// Console.WriteLine("Using the following devices:");
-// PortAudioHelper.PrintDefaultDevices();
+Console.WriteLine("Using the following devices:");
+PortAudioHelper.PrintDefaultDevices(true);
 
 try
 {
-  Log.Information("Starting recording and playback...");
+  Log.Information("Starting recording");
   recorder.Start();
 
   delayHandler.Wait(arguments.Delay, arguments.Debug);
 
-  Log.Information("Starting playback...");
+  Log.Information("Starting playback");
   recorder.Play();
 
   delayHandler.Wait(arguments.Runtime, arguments.Debug);
 
   recorder.Stop();
-  Log.Information("Stopped recording.");
+  Log.Information("Stopped recording");
 
   delayHandler.Wait(arguments.Delay, arguments.Debug);
 
   recorder.StopPlayback();
-  Log.Information("Stopped playback.");
+  Log.Information("Stopped playback");
 
   return 0;
 }
 catch (Exception ex)
 {
-  Log.Error(ex, "An error occurred.");
+  Log.Error(ex, "An error occurred");
   return 1;
 }
 finally

@@ -23,10 +23,18 @@ public static class PortAudioHelper
     return devices;
   }
 
-  public static void PrintDefaultDevices()
+  public static void PrintDefaultDevices(bool brief)
   {
-    Console.WriteLine("Default Input Device: " + PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice));
-    Console.WriteLine("Default Output Device: " + PortAudio.GetDeviceInfo(PortAudio.DefaultOutputDevice));
+    if (brief)
+    {
+      Console.WriteLine("Default Input Device: " + PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice).name);
+      Console.WriteLine("Default Output Device: " + PortAudio.GetDeviceInfo(PortAudio.DefaultOutputDevice).name);
+    }
+    else
+    {
+      Console.WriteLine("Default Input Device: " + PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice));
+      Console.WriteLine("Default Output Device: " + PortAudio.GetDeviceInfo(PortAudio.DefaultOutputDevice));
+    }
   }
 
   public static void PrintOutputDevices()
