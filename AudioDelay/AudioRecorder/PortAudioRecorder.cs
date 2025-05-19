@@ -14,6 +14,9 @@ public class PortAudioRecorder : AudioRecorder
   public PortAudioRecorder(Arguments args) : base(args)
   {
     PortAudio.Initialize();
+
+    #region Input
+
     var inputParams = new StreamParameters
     {
       device = PortAudio.DefaultInputDevice,
@@ -32,19 +35,18 @@ public class PortAudioRecorder : AudioRecorder
     };
 
     var sampleRate = (int)PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice).defaultSampleRate;
-    uint framesPerBuffer = 256;
     var recordedSamples = new float[sampleRate * 3];
     var sampleIndex = 0;
     var totalFrames = recordedSamples.Length;
 
-    Stream.Callback callback = (
+    StreamCallbackResult Callback(
       IntPtr inputBuffer,
       IntPtr outputBuffer,
       uint frameCount,
       ref StreamCallbackTimeInfo timeInfo,
       StreamCallbackFlags statusFlags,
       IntPtr userDataPtr
-    ) =>
+    )
     {
       var framesToCopy = (int)Math.Min(frameCount, totalFrames - sampleIndex);
       if (framesToCopy > 0)
@@ -56,37 +58,38 @@ public class PortAudioRecorder : AudioRecorder
       }
 
       return StreamCallbackResult.Continue;
-    };
+    }
 
     _inputStream = new Stream(inputParams,
       null,
       PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice).defaultSampleRate,
       0,
       StreamFlags.NoFlag,
-      callback,
+      Callback,
       null
     );
 
-    var playFinished = false;
+    #endregion
+
+    #region Output
+
     float[]? lastSampleArray = null;
-    var lastIndex = 0; // not played
+    var lastIndex = 0;
     var dataItems = new BlockingCollection<float[]>(recordedSamples.Length);
     dataItems.Add(recordedSamples);
     dataItems.CompleteAdding();
 
-    Stream.Callback playCallback = (
+    StreamCallbackResult PlayCallback(
       IntPtr input,
       IntPtr output,
       uint frameCount,
       ref StreamCallbackTimeInfo timeInfo,
       StreamCallbackFlags statusFlags,
       IntPtr userData
-    ) =>
+    )
     {
       if (dataItems.IsCompleted && lastSampleArray == null && lastIndex == 0)
       {
-        Console.WriteLine("Finished playing");
-        playFinished = true;
         return StreamCallbackResult.Complete;
       }
 
@@ -102,7 +105,7 @@ public class PortAudioRecorder : AudioRecorder
           var remaining = lastSampleArray.Length - lastIndex;
           if (remaining >= needed)
           {
-            var this_block = lastSampleArray.Skip(lastIndex).Take(needed).ToArray();
+            var thisBlock = lastSampleArray.Skip(lastIndex).Take(needed).ToArray();
             lastIndex += needed;
             if (lastIndex == lastSampleArray.Length)
             {
@@ -110,15 +113,15 @@ public class PortAudioRecorder : AudioRecorder
               lastIndex = 0;
             }
 
-            Marshal.Copy(this_block, 0, IntPtr.Add(output, i * sizeof(float)), needed);
+            Marshal.Copy(thisBlock, 0, IntPtr.Add(output, i * sizeof(float)), needed);
             return StreamCallbackResult.Continue;
           }
 
-          var this_block2 = lastSampleArray.Skip(lastIndex).Take(remaining).ToArray();
+          var thisBlock2 = lastSampleArray.Skip(lastIndex).Take(remaining).ToArray();
           lastIndex = 0;
           lastSampleArray = null;
 
-          Marshal.Copy(this_block2, 0, IntPtr.Add(output, i * sizeof(float)), remaining);
+          Marshal.Copy(thisBlock2, 0, IntPtr.Add(output, i * sizeof(float)), remaining);
           i += remaining;
           continue;
         }
@@ -137,16 +140,18 @@ public class PortAudioRecorder : AudioRecorder
       }
 
       return StreamCallbackResult.Continue;
-    };
+    }
 
     _outputStream = new Stream(null,
       outputParams,
       PortAudio.GetDeviceInfo(PortAudio.DefaultOutputDevice).defaultSampleRate,
       0,
       StreamFlags.NoFlag,
-      playCallback,
+      PlayCallback,
       null
     );
+
+    #endregion
   }
 
   public override void Play()
@@ -162,13 +167,11 @@ public class PortAudioRecorder : AudioRecorder
 
   public override void Start()
   {
-    // Start the audio stream
     _inputStream.Start();
   }
 
   public override void Stop()
   {
-    // Stop the audio stream
     _inputStream.Stop();
     _inputStream.Close();
   }
