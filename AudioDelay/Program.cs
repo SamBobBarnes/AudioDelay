@@ -24,15 +24,14 @@ Log.Logger = LoggerConfigurator.ConfigureLogger(arguments).CreateLogger();
 
 AudioRecorder recorder = new PortAudioRecorder(arguments);
 
-PortAudioHelper.PrintDefaultDevices();
-
-return 0;
-
 if (arguments.ListDevices)
 {
   PortAudioHelper.PrintDevices();
   return 0;
 }
+
+// Console.WriteLine("Using the following devices:");
+// PortAudioHelper.PrintDefaultDevices();
 
 try
 {
