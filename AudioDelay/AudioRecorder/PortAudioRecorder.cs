@@ -9,13 +9,10 @@ namespace AudioDelay.AudioRecorder;
 public class PortAudioRecorder : AudioRecorder
 {
   private readonly Stream _inputStream;
-  private MemoryStream _memoryStream;
   private readonly Stream _outputStream;
 
   public PortAudioRecorder(Arguments args) : base(args)
   {
-    // Initialize PortAudio and set up the audio stream here
-    // This is a placeholder for the actual implementation
     PortAudio.Initialize();
     var inputParams = new StreamParameters
     {
