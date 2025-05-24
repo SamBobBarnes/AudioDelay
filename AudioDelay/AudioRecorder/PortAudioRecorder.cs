@@ -37,7 +37,7 @@ public class PortAudioRecorder : AudioRecorder
     };
 
     var sampleRate = (int)PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice).defaultSampleRate;
-    var recordedSamples = new float[sampleRate * args.RecordingLength];
+    var recordedSamples = new float[sampleRate * (args.RecordingLength / 1000)];
     var sampleIndex = 0;
     var totalFrames = recordedSamples.Length;
 
@@ -74,8 +74,6 @@ public class PortAudioRecorder : AudioRecorder
     #endregion
 
     #region Output
-
-    if (_debug) Console.WriteLine("Length of 'recordedSamples': " + recordedSamples.Length);
 
     float[]? lastSampleArray = null;
     var lastIndex = 0;
