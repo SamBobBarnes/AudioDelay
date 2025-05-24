@@ -33,6 +33,14 @@ if (arguments.ListDevices)
 Console.WriteLine("Using the following devices:");
 PortAudioHelper.PrintDefaultDevices(true);
 
+if (arguments.Debug)
+{
+  Log.Debug("Debug mode is enabled");
+  Log.Debug($"Delay: {arguments.Delay} ms");
+  Log.Debug($"Runtime: {arguments.Runtime} ms");
+  Log.Debug($"Recording Length: {arguments.RecordingLength} ms");
+}
+
 try
 {
   Log.Information("Starting recording");
