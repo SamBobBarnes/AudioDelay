@@ -8,11 +8,13 @@ namespace AudioDelay.AudioRecorder;
 
 public class PortAudioRecorder : AudioRecorder
 {
+  private readonly bool _debug;
   private readonly Stream _inputStream;
   private readonly Stream _outputStream;
 
   public PortAudioRecorder(Arguments args) : base(args)
   {
+    _debug = args.Debug;
     PortAudio.Initialize();
 
     #region Input
@@ -30,12 +32,12 @@ public class PortAudioRecorder : AudioRecorder
       device = PortAudio.DefaultOutputDevice,
       channelCount = 1, // Mono
       sampleFormat = SampleFormat.Float32,
-      suggestedLatency = PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice).defaultLowInputLatency,
+      suggestedLatency = PortAudio.GetDeviceInfo(PortAudio.DefaultOutputDevice).defaultLowInputLatency,
       hostApiSpecificStreamInfo = IntPtr.Zero
     };
 
     var sampleRate = (int)PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice).defaultSampleRate;
-    var recordedSamples = new float[sampleRate * 3];
+    var recordedSamples = new float[sampleRate * args.RecordingLength];
     var sampleIndex = 0;
     var totalFrames = recordedSamples.Length;
 
@@ -72,6 +74,8 @@ public class PortAudioRecorder : AudioRecorder
     #endregion
 
     #region Output
+
+    if (_debug) Console.WriteLine("Length of 'recordedSamples': " + recordedSamples.Length);
 
     float[]? lastSampleArray = null;
     var lastIndex = 0;
