@@ -16,6 +16,7 @@
     <ItemGroup>
         <PackageReference Include="Elastic.Serilog.Sinks" Version="8.11.1"/>
         <PackageReference Include="NAudio" Version="2.2.1"/>
+        <PackageReference Include="PortAudioSharp2" Version="1.0.4"/>
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.1"/>
         <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.3.0"/>
     </ItemGroup>

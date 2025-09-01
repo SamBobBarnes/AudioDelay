@@ -10,7 +10,7 @@ public class Arguments
   public bool ListDevices { get; set; }
   public int InputDevice { get; set; } = 0;
   public int OutputDevice { get; set; } = 0;
-  public string LoggerName { get; set; } = "";
+  public string LoggerName { get; set; } = string.Empty;
   public Uri? LoggerUrl { get; set; }
 }
 

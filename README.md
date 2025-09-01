@@ -56,6 +56,10 @@ dotnet publish -c Release -r win-x64 --self-contained
 .\AudioDelay.exe --delay 2000 --content-length 3000 --debug
 ```
 
+### Linux
+You will need to add the portaudio dependency to your system with `sudo apt-get install libportaudio2`
+
+
 ## Development
 This project is developed in C# using JetBrains Rider. The project includes unit tests to ensure the functionality of the application.  
 

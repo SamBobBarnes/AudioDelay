@@ -14,18 +14,10 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     var multiplier = 1;
     switch (ParseTimeFormat(argsList))
     {
-      case "ms":
-        multiplier = 1;
-        break;
-      case "s":
-        multiplier = 1000;
-        break;
-      case "m":
-        multiplier = 60000;
-        break;
-      case "h":
-        multiplier = 3600000;
-        break;
+      case "ms": multiplier = 1; break;
+      case "s": multiplier = 1000; break;
+      case "m": multiplier = 60000; break;
+      case "h": multiplier = 3600000; break;
     }
 
     result.Delay = ParseDelay(argsList) * multiplier;
@@ -175,7 +167,7 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     {
       var outputDevice = int.Parse(args[index + 1]);
       var deviceCount = deviceHandler.GetOutputDeviceCount();
-      if (outputDevice < 0 || outputDevice >= deviceCount)
+      if (outputDevice <= 0 || outputDevice > deviceCount)
         throw new ArgumentOutOfRangeException(nameof(outputDevice), outputDevice.ToString());
       return outputDevice;
     }
@@ -192,7 +184,7 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     }
   }
 
-  protected (string, Uri) ParseLoggers(List<string> args)
+  protected (string, Uri?) ParseLoggers(List<string> args)
   {
     var uriPattern = @"^(http|https):\/\/[\w-]+(\.[\w-]+)*(:[0-9]{1,5})?(\/\S*)?$";
     var loggerNamePattern = @"^(loki|elasticsearch)";

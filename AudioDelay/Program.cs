@@ -22,49 +22,50 @@ if (arguments.Help)
 
 Log.Logger = LoggerConfigurator.ConfigureLogger(arguments).CreateLogger();
 
-AudioRecorder recorder;
-
-switch (runtime)
-{
-  case "win-x64":
-    recorder = new WindowsAudioRecorder(arguments);
-    break;
-  default:
-    Console.WriteLine("Unsupported OS.");
-    return 1;
-}
+AudioRecorder recorder = new PortAudioRecorder(arguments);
 
 if (arguments.ListDevices)
 {
-  Console.Write(deviceHandler.GetDevices());
+  PortAudioHelper.PrintDevices();
   return 0;
+}
+
+Console.WriteLine("Using the following devices:");
+PortAudioHelper.PrintDefaultDevices(true);
+
+if (arguments.Debug)
+{
+  Log.Debug("Debug mode is enabled");
+  Log.Debug($"Delay: {arguments.Delay} ms");
+  Log.Debug($"Runtime: {arguments.Runtime} ms");
+  Log.Debug($"Recording Length: {arguments.RecordingLength} ms");
 }
 
 try
 {
-  Log.Information("Starting recording and playback...");
+  Log.Information("Starting recording");
   recorder.Start();
 
   delayHandler.Wait(arguments.Delay, arguments.Debug);
 
-  Log.Information("Starting playback...");
+  Log.Information("Starting playback");
   recorder.Play();
 
   delayHandler.Wait(arguments.Runtime, arguments.Debug);
 
   recorder.Stop();
-  Log.Information("Stopped recording.");
+  Log.Information("Stopped recording");
 
   delayHandler.Wait(arguments.Delay, arguments.Debug);
 
   recorder.StopPlayback();
-  Log.Information("Stopped playback.");
+  Log.Information("Stopped playback");
 
   return 0;
 }
 catch (Exception ex)
 {
-  Log.Error(ex, "An error occurred.");
+  Log.Error(ex, "An error occurred");
   return 1;
 }
 finally
