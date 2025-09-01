@@ -51,13 +51,13 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            ./AudioDelay/bin/Debug/net8.0/AudioDelay.exe
+            ./AudioDelay/bin/Debug/net8.0/audiodelay.exe
           else
-            ./AudioDelay/bin/Debug/net8.0/AudioDelay
+            ./AudioDelay/bin/Debug/net8.0/audiodelay
           fi
           
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: AudioDelay-${{ matrix.os }}
-          path: ./AudioDelay/bin/Debug/net8.0/AudioDelay*
+          path: ./AudioDelay/bin/Debug/net8.0/audiodelay*
