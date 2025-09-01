@@ -55,3 +55,9 @@ jobs:
           else
             ./AudioDelay/bin/Debug/net8.0/AudioDelay
           fi
+          
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: AudioDelay-${{ matrix.os }}
+          file: ./AudioDelay/bin/Debug/net8.0/AudioDelay*
