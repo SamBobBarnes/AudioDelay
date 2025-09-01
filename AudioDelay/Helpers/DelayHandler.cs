@@ -8,7 +8,7 @@ public class DelayHandler(IThreadHandler threadHandler)
   {
     if (debug)
     {
-      Log.Debug($"Waiting for {ms} milliseconds...");
+      Log.Information("Waiting for {Ms} milliseconds...", ms);
 
       for (var temp = 0; temp < ms; temp += 1000)
       {
@@ -17,10 +17,10 @@ public class DelayHandler(IThreadHandler threadHandler)
         else
           threadHandler.Sleep(1000);
 
-        Log.Debug($"Waited for {(double)temp / 1000 + 1} seconds...");
+        Log.Information("Waited for {Temp} seconds...", (double)temp / 1000 + 1);
       }
 
-      Log.Debug("Done waiting.");
+      Log.Information("Done waiting");
     }
     else
       threadHandler.Sleep(ms);

@@ -1,6 +1,7 @@
 ﻿using AudioDelay.Helpers;
 using FluentAssertions;
 using NSubstitute;
+using Serilog;
 
 namespace Tests.Helpers;
 
@@ -49,16 +50,19 @@ public class DelayHandlerTests
     {
         var stringWriter = new StringWriter();
         Console.SetOut(stringWriter);
+        Log.Logger = new LoggerConfiguration()
+          .WriteTo.TextWriter(stringWriter)
+          .CreateLogger();
         
         _delayHandler.Wait(3000, true);
         
         var output = stringWriter.ToString().Split(Environment.NewLine);
 
-        output.Should().Contain("Waiting for 3000 milliseconds...");
-        output.Should().Contain("Waited for 1 seconds...");
-        output.Should().Contain("Waited for 2 seconds...");
-        output.Should().Contain("Waited for 3 seconds...");
-        output.Should().Contain("Done waiting.");
+        output[0].Should().Contain("Waiting for 3000 milliseconds...");
+        output[1].Should().Contain("Waited for 1 seconds...");
+        output[2].Should().Contain("Waited for 2 seconds...");
+        output[3].Should().Contain("Waited for 3 seconds...");
+        output[4].Should().Contain("Done waiting");
         
         var standardOutput = new StreamWriter(Console.OpenStandardOutput());
         Console.SetOut(standardOutput);
