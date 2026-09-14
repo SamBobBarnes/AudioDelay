@@ -8,8 +8,8 @@ public class Arguments
   public int RecordingLength => Delay + Runtime;
   public bool Debug { get; set; }
   public bool ListDevices { get; set; }
-  public int InputDevice { get; set; } = 0;
-  public int OutputDevice { get; set; } = 0;
+  public int InputDevice { get; set; }
+  public int OutputDevice { get; set; }
   public string LoggerName { get; set; } = "";
   public Uri? LoggerUrl { get; set; }
 }

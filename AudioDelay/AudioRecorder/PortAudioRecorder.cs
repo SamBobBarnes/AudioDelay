@@ -12,17 +12,26 @@ public class PortAudioRecorder : AudioRecorder
   private const uint FramesPerBuffer = 2048;
   private const int BytesPerSample = sizeof(short);
 
-  private readonly Arguments _args;
   private readonly PortAudioStream _inputStream;
   private readonly PortAudioStream _outputStream;
   private readonly Queue<byte> _audioQueue = new();
   private readonly object _queueLock = new();
+  private readonly bool _portAudioInitialized;
   private bool _disposed;
 
   public PortAudioRecorder(Arguments args) : base(args)
   {
-    _args = args;
-    PortAudio.Initialize();
+    try
+    {
+      PortAudio.Initialize();
+      _portAudioInitialized = true;
+    }
+    catch (PortAudioException ex) when (OperatingSystem.IsLinux())
+    {
+      throw new InvalidOperationException(
+        "PortAudio could not initialize on Linux. This is usually caused by the system audio stack or PortAudio host probing. Install libasound2-dev or portaudio19-dev, make sure a default input and output device exist, and if JACK is not in use prefer running with PulseAudio/PipeWire available.",
+        ex);
+    }
 
     var inputDevice = ResolveInputDevice(args.InputDevice);
     var outputDevice = ResolveOutputDevice(args.OutputDevice);
@@ -80,7 +89,8 @@ public class PortAudioRecorder : AudioRecorder
 
     _inputStream.Dispose();
     _outputStream.Dispose();
-    PortAudio.Terminate();
+    if (_portAudioInitialized)
+      PortAudio.Terminate();
   }
 
   private static StreamParameters CreateInputParameters(int device, DeviceInfo deviceInfo) =>

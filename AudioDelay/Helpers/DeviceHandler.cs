@@ -20,7 +20,7 @@ public class DeviceHandler : IDeviceHandler
         if (OperatingSystem.IsWindows())
             return GetWindowsInputDeviceCount();
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
-            return GetPortAudioInputDeviceCount();
+            return HasDefaultPortAudioInputDevice() ? 1 : 0;
 
         return -1;
     }
@@ -30,7 +30,7 @@ public class DeviceHandler : IDeviceHandler
         if (OperatingSystem.IsWindows())
             return GetWindowsOutputDeviceCount();
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
-            return GetPortAudioOutputDeviceCount();
+            return HasDefaultPortAudioOutputDevice() ? 1 : 0;
 
         return -1;
     }
@@ -40,7 +40,7 @@ public class DeviceHandler : IDeviceHandler
         if (OperatingSystem.IsWindows())
             return GetWindowsDevices();
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
-            return GetPortAudioDevices();
+            return GetDefaultPortAudioDevices();
 
         return "No devices available for this runtime.";
     }
@@ -48,7 +48,7 @@ public class DeviceHandler : IDeviceHandler
     public bool IsDefaultDeviceIndex(int deviceIndex)
     {
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
-            return deviceIndex == -1;
+            return deviceIndex is -1 or 0;
 
         return deviceIndex == 0;
     }
@@ -135,13 +135,28 @@ public class DeviceHandler : IDeviceHandler
         }
     }
 
-    private int GetPortAudioInputDeviceCount()
+    private string GetDefaultPortAudioDevices()
     {
         PortAudio.Initialize();
         try
         {
-            return Enumerable.Range(0, PortAudio.DeviceCount)
-                .Count(index => PortAudio.GetDeviceInfo(index).maxInputChannels > 0);
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("Input devices:");
+            if (PortAudio.DefaultInputDevice == PortAudio.NoDevice)
+                stringBuilder.AppendLine("-1: No default input device");
+            else
+                stringBuilder.AppendLine($"-1: Default Input Device ({PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice).name})");
+
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("Playback devices:");
+            if (PortAudio.DefaultOutputDevice == PortAudio.NoDevice)
+                stringBuilder.AppendLine("-1: No default output device");
+            else
+                stringBuilder.AppendLine($"-1: Default Output Device ({PortAudio.GetDeviceInfo(PortAudio.DefaultOutputDevice).name})");
+
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("Linux/macOS currently use only the system default PortAudio devices.");
+            return stringBuilder.ToString();
         }
         finally
         {
@@ -149,13 +164,25 @@ public class DeviceHandler : IDeviceHandler
         }
     }
 
-    private int GetPortAudioOutputDeviceCount()
+    private bool HasDefaultPortAudioInputDevice()
     {
         PortAudio.Initialize();
         try
         {
-            return Enumerable.Range(0, PortAudio.DeviceCount)
-                .Count(index => PortAudio.GetDeviceInfo(index).maxOutputChannels > 0);
+            return PortAudio.DefaultInputDevice != PortAudio.NoDevice;
+        }
+        finally
+        {
+            PortAudio.Terminate();
+        }
+    }
+
+    private bool HasDefaultPortAudioOutputDevice()
+    {
+        PortAudio.Initialize();
+        try
+        {
+            return PortAudio.DefaultOutputDevice != PortAudio.NoDevice;
         }
         finally
         {

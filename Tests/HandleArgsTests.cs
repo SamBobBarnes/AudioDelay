@@ -442,7 +442,15 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
 
     var actual = ParseArgs(args);
 
-    actual.Should().BeEquivalentTo(new Arguments { Delay = 5000, Runtime = 0, Help = false, Debug = false });
+    actual.Should().BeEquivalentTo(new Arguments
+    {
+      Delay = 5000,
+      Runtime = 0,
+      Help = false,
+      Debug = false,
+      InputDevice = 0,
+      OutputDevice = 0
+    });
   }
 
   [Fact]
@@ -492,7 +500,14 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
 
     var actual = ParseArgs(args);
 
-    actual.Should().BeEquivalentTo(new Arguments { Delay = delayResult, Runtime = runtimeResult, Help = false });
+    actual.Should().BeEquivalentTo(new Arguments
+    {
+      Delay = delayResult,
+      Runtime = runtimeResult,
+      Help = false,
+      InputDevice = 0,
+      OutputDevice = 0
+    });
   }
 
   [Fact]

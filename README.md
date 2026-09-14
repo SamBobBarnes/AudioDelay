@@ -64,6 +64,8 @@ This project is developed in C# and includes unit tests to ensure the functional
 - **Windows:** uses `NAudio`.
 - **Linux/macOS:** uses `PortAudioSharp`, which requires the PortAudio native library to be available at runtime.
 
+On Linux/macOS, the app currently targets the **system default** input and output devices via PortAudio. Use `-1` or `0` for the default device on those platforms; explicit non-default device selection is still Windows-only.
+
 On Debian/Ubuntu, install PortAudio with:
 
 ```bash
