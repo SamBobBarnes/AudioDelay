@@ -36,7 +36,7 @@ switch (runtime)
     recorder = new PortAudioRecorder(arguments);
     break;
   default:
-    Console.WriteLine("Unsupported OS.");
+    Console.WriteLine($"Unsupported OS. ({runtime})");
     return 1;
 }
 
