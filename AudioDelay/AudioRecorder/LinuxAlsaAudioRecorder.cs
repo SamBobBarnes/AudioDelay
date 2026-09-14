@@ -11,21 +11,25 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
   private const int PeriodFrames = 1024;
   private const uint LatencyUs = 100000;
 
+  private readonly int _delayBytes;
   private readonly IntPtr _captureHandle;
   private readonly IntPtr _playbackHandle;
-  private readonly Queue<byte> _audioQueue = new();
-  private readonly object _queueLock = new();
+  private readonly List<byte> _audioBuffer = [];
+  private readonly object _bufferLock = new();
   private readonly object _stateLock = new();
   private readonly byte[] _captureBuffer = new byte[PeriodFrames * ChannelCount * BytesPerSample];
+  private readonly byte[] _playbackBuffer = new byte[PeriodFrames * ChannelCount * BytesPerSample];
   private readonly byte[] _silenceBuffer = new byte[PeriodFrames * ChannelCount * BytesPerSample];
   private Thread? _captureThread;
   private Thread? _playbackThread;
+  private int _playbackReadOffset;
   private bool _captureRunning;
   private bool _playbackRunning;
   private bool _disposed;
 
   public LinuxAlsaAudioRecorder(Arguments args) : base(args)
   {
+    _delayBytes = checked((int)((long)args.Delay * SampleRate * ChannelCount * BytesPerSample / 1000));
     _captureHandle = AlsaNative.OpenPcm("default", AlsaNative.CaptureStream);
     _playbackHandle = AlsaNative.OpenPcm("default", AlsaNative.PlaybackStream);
 
@@ -133,10 +137,10 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
       }
 
       var bytesRead = checked((int)framesRead * (int)ChannelCount * BytesPerSample);
-      lock (_queueLock)
+      lock (_bufferLock)
       {
         for (var i = 0; i < bytesRead; i++)
-          _audioQueue.Enqueue(_captureBuffer[i]);
+          _audioBuffer.Add(_captureBuffer[i]);
       }
     }
   }
@@ -145,11 +149,8 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
   {
     while (_playbackRunning)
     {
-      var framesToWrite = FillPlaybackBuffer();
-      var buffer = framesToWrite == 0 ? _silenceBuffer : _captureBuffer;
-      var requestedFrames = framesToWrite == 0 ? PeriodFrames : framesToWrite;
-
-      var framesWritten = AlsaNative.WriteInterleaved(_playbackHandle, buffer, (ulong)requestedFrames);
+      FillPlaybackBuffer();
+      var framesWritten = WriteFullPeriod();
       if (framesWritten < 0)
       {
         framesWritten = AlsaNative.Recover(_playbackHandle, framesWritten, 1);
@@ -158,17 +159,51 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
     }
   }
 
-  private int FillPlaybackBuffer()
+  private long WriteFullPeriod()
   {
-    Array.Clear(_captureBuffer);
-
-    lock (_queueLock)
+    var totalFramesWritten = 0L;
+    while (totalFramesWritten < PeriodFrames && _playbackRunning)
     {
-      var bytesToCopy = Math.Min(_captureBuffer.Length, _audioQueue.Count);
-      for (var i = 0; i < bytesToCopy; i++)
-        _captureBuffer[i] = _audioQueue.Dequeue();
+      var frameOffset = (int)totalFramesWritten;
+      var framesRemaining = PeriodFrames - frameOffset;
+      var byteOffset = frameOffset * (int)ChannelCount * BytesPerSample;
+      var byteCount = framesRemaining * (int)ChannelCount * BytesPerSample;
+      var tempBuffer = new byte[byteCount];
+      Buffer.BlockCopy(_playbackBuffer, byteOffset, tempBuffer, 0, byteCount);
 
-      return bytesToCopy / (int)(ChannelCount * BytesPerSample);
+      var framesWritten = AlsaNative.WriteInterleaved(_playbackHandle, tempBuffer, (ulong)framesRemaining);
+      if (framesWritten < 0)
+        return framesWritten;
+      if (framesWritten == 0)
+        break;
+
+      totalFramesWritten += framesWritten;
+    }
+
+    return totalFramesWritten;
+  }
+
+  private void FillPlaybackBuffer()
+  {
+    Array.Clear(_playbackBuffer);
+
+    lock (_bufferLock)
+    {
+      var availableDelayedBytes = _audioBuffer.Count - _playbackReadOffset - _delayBytes;
+      if (availableDelayedBytes <= 0)
+        return;
+
+      var bytesToCopy = Math.Min(_playbackBuffer.Length, availableDelayedBytes);
+      for (var i = 0; i < bytesToCopy; i++)
+        _playbackBuffer[i] = _audioBuffer[_playbackReadOffset + i];
+
+      _playbackReadOffset += bytesToCopy;
+
+      if (_playbackReadOffset <= _delayBytes || _playbackReadOffset <= _audioBuffer.Count / 2)
+        return;
+
+      _audioBuffer.RemoveRange(0, _playbackReadOffset);
+      _playbackReadOffset = 0;
     }
   }
 }
