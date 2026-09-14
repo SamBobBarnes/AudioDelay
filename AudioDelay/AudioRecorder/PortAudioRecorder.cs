@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using AudioDelay.Args;
+using AudioDelay.Interop;
 using PortAudioSharp;
 using PortAudioStream = PortAudioSharp.Stream;
 
@@ -21,17 +22,10 @@ public class PortAudioRecorder : AudioRecorder
 
   public PortAudioRecorder(Arguments args) : base(args)
   {
-    try
-    {
-      PortAudio.Initialize();
-      _portAudioInitialized = true;
-    }
-    catch (PortAudioException ex) when (OperatingSystem.IsLinux())
-    {
-      throw new InvalidOperationException(
-        "PortAudio could not initialize on Linux. This is usually caused by the system audio stack or PortAudio host probing. Install libasound2-dev or portaudio19-dev, make sure a default input and output device exist, and if JACK is not in use prefer running with PulseAudio/PipeWire available.",
-        ex);
-    }
+    var initError = PortAudioNative.Initialize();
+    if (initError != 0)
+      throw CreateInitializationException(initError);
+    _portAudioInitialized = true;
 
     var inputDevice = ResolveInputDevice(args.InputDevice);
     var outputDevice = ResolveOutputDevice(args.OutputDevice);
@@ -90,7 +84,20 @@ public class PortAudioRecorder : AudioRecorder
     _inputStream.Dispose();
     _outputStream.Dispose();
     if (_portAudioInitialized)
-      PortAudio.Terminate();
+      PortAudioNative.Terminate();
+  }
+
+  private static Exception CreateInitializationException(int errorCode)
+  {
+    var message = PortAudioNative.GetErrorMessage(errorCode);
+
+    if (OperatingSystem.IsLinux())
+    {
+      return new InvalidOperationException(
+        $"PortAudio could not initialize on Linux: {message}. This usually means PortAudio host probing hit a broken ALSA/JACK configuration. Ensure the machine has working default capture and playback devices; if JACK is not used, prefer a clean ALSA/PipeWire/PulseAudio default-device setup.");
+    }
+
+    return new InvalidOperationException($"PortAudio could not initialize: {message}");
   }
 
   private static StreamParameters CreateInputParameters(int device, DeviceInfo deviceInfo) =>
