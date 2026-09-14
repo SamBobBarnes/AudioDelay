@@ -62,14 +62,15 @@ This project is developed in C# and includes unit tests to ensure the functional
 ## Platform support
 
 - **Windows:** uses `NAudio`.
-- **Linux/macOS:** uses `PortAudioSharp`, which requires the PortAudio native library to be available at runtime.
+- **Linux:** uses direct ALSA interop against the system default capture and playback devices.
+- **macOS:** not implemented yet.
 
-On Linux/macOS, the app currently targets the **system default** input and output devices via PortAudio. Use `-1` or `0` for the default device on those platforms; explicit non-default device selection is still Windows-only.
+On Linux, use `-1` or `0` for the default device; explicit non-default device selection is still Windows-only.
 
-On Debian/Ubuntu, install PortAudio with:
+On Debian/Ubuntu, install ALSA development/runtime packages with:
 
 ```bash
-sudo apt-get install portaudio19-dev
+sudo apt-get install libasound2-dev alsa-utils
 ```
 
 Then publish or run normally with the same CLI arguments.

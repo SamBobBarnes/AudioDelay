@@ -23,8 +23,10 @@ AudioRecorder recorder;
 
 if (OperatingSystem.IsWindows())
   recorder = new WindowsAudioRecorder(arguments);
-else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
-  recorder = new PortAudioRecorder(arguments);
+else if (OperatingSystem.IsLinux())
+  recorder = new LinuxAlsaAudioRecorder(arguments);
+else if (OperatingSystem.IsMacOS())
+  throw new PlatformNotSupportedException("macOS audio support is not implemented.");
 else
 {
   Console.WriteLine("Unsupported OS.");

@@ -1,7 +1,6 @@
-﻿using System.Text;
+using System.Text;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using PortAudioSharp;
 
 namespace AudioDelay.Helpers;
 
@@ -19,8 +18,10 @@ public class DeviceHandler : IDeviceHandler
     {
         if (OperatingSystem.IsWindows())
             return GetWindowsInputDeviceCount();
-        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
-            return HasDefaultPortAudioInputDevice() ? 1 : 0;
+        if (OperatingSystem.IsLinux())
+            return 1;
+        if (OperatingSystem.IsMacOS())
+            return 0;
 
         return -1;
     }
@@ -29,8 +30,10 @@ public class DeviceHandler : IDeviceHandler
     {
         if (OperatingSystem.IsWindows())
             return GetWindowsOutputDeviceCount();
-        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
-            return HasDefaultPortAudioOutputDevice() ? 1 : 0;
+        if (OperatingSystem.IsLinux())
+            return 1;
+        if (OperatingSystem.IsMacOS())
+            return 0;
 
         return -1;
     }
@@ -39,8 +42,10 @@ public class DeviceHandler : IDeviceHandler
     {
         if (OperatingSystem.IsWindows())
             return GetWindowsDevices();
-        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
-            return GetDefaultPortAudioDevices();
+        if (OperatingSystem.IsLinux())
+            return GetLinuxDevices();
+        if (OperatingSystem.IsMacOS())
+            return "No devices available for this runtime.";
 
         return "No devices available for this runtime.";
     }
@@ -99,95 +104,19 @@ public class DeviceHandler : IDeviceHandler
     
     #endregion
 
-    #region PortAudio
+    #region Linux
 
-    private string GetPortAudioDevices()
+    private string GetLinuxDevices()
     {
-        PortAudio.Initialize();
-        try
-        {
-            var stringBuilder = new StringBuilder();
-
-            stringBuilder.AppendLine("Input devices:");
-            stringBuilder.AppendLine($"-1: Default Input Device ({PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice).name})");
-            for (var i = 0; i < PortAudio.DeviceCount; i++)
-            {
-                var device = PortAudio.GetDeviceInfo(i);
-                if (device.maxInputChannels > 0)
-                    stringBuilder.AppendLine($"{i}: {device.name}");
-            }
-
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("Playback devices:");
-            stringBuilder.AppendLine($"-1: Default Output Device ({PortAudio.GetDeviceInfo(PortAudio.DefaultOutputDevice).name})");
-            for (var i = 0; i < PortAudio.DeviceCount; i++)
-            {
-                var device = PortAudio.GetDeviceInfo(i);
-                if (device.maxOutputChannels > 0)
-                    stringBuilder.AppendLine($"{i}: {device.name}");
-            }
-
-            return stringBuilder.ToString();
-        }
-        finally
-        {
-            PortAudio.Terminate();
-        }
-    }
-
-    private string GetDefaultPortAudioDevices()
-    {
-        PortAudio.Initialize();
-        try
-        {
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("Input devices:");
-            if (PortAudio.DefaultInputDevice == PortAudio.NoDevice)
-                stringBuilder.AppendLine("-1: No default input device");
-            else
-                stringBuilder.AppendLine($"-1: Default Input Device ({PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice).name})");
-
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("Playback devices:");
-            if (PortAudio.DefaultOutputDevice == PortAudio.NoDevice)
-                stringBuilder.AppendLine("-1: No default output device");
-            else
-                stringBuilder.AppendLine($"-1: Default Output Device ({PortAudio.GetDeviceInfo(PortAudio.DefaultOutputDevice).name})");
-
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("Linux/macOS currently use only the system default PortAudio devices.");
-            return stringBuilder.ToString();
-        }
-        finally
-        {
-            PortAudio.Terminate();
-        }
-    }
-
-    private bool HasDefaultPortAudioInputDevice()
-    {
-        PortAudio.Initialize();
-        try
-        {
-            return PortAudio.DefaultInputDevice != PortAudio.NoDevice;
-        }
-        finally
-        {
-            PortAudio.Terminate();
-        }
-    }
-
-    private bool HasDefaultPortAudioOutputDevice()
-    {
-        PortAudio.Initialize();
-        try
-        {
-            return PortAudio.DefaultOutputDevice != PortAudio.NoDevice;
-        }
-        finally
-        {
-            PortAudio.Terminate();
-        }
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine("Input devices:");
+        stringBuilder.AppendLine("0: default");
+        stringBuilder.AppendLine();
+        stringBuilder.AppendLine("Playback devices:");
+        stringBuilder.AppendLine("0: default");
+        stringBuilder.AppendLine();
+        stringBuilder.AppendLine("Linux currently uses the ALSA default capture and playback devices.");
+        return stringBuilder.ToString();
     }
 
     #endregion
