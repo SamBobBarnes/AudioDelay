@@ -15,68 +15,42 @@ public interface IDeviceHandler
 
 public class DeviceHandler : IDeviceHandler
 {
-    private readonly string _runtime = System.Runtime.InteropServices.RuntimeInformation.RuntimeIdentifier;
-
     public int GetInputDeviceCount()
     {
-        switch (_runtime)
-        {
-            case "win-x64":
-                return GetWindowsInputDeviceCount();
-            case "linux-x64":
-            case "linux-arm64":
-            case "osx-x64":
-            case "osx-arm64":
-                return GetPortAudioInputDeviceCount();
-            default:
-                return -1;
-        }
+        if (OperatingSystem.IsWindows())
+            return GetWindowsInputDeviceCount();
+        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+            return GetPortAudioInputDeviceCount();
+
+        return -1;
     }
     
     public int GetOutputDeviceCount()
     {
-        switch (_runtime)
-        {
-            case "win-x64":
-                return GetWindowsOutputDeviceCount();
-            case "linux-x64":
-            case "linux-arm64":
-            case "osx-x64":
-            case "osx-arm64":
-                return GetPortAudioOutputDeviceCount();
-            default:
-                return -1;
-        }
+        if (OperatingSystem.IsWindows())
+            return GetWindowsOutputDeviceCount();
+        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+            return GetPortAudioOutputDeviceCount();
+
+        return -1;
     }
     
     public string GetDevices()
     {
-        switch (_runtime)
-        {
-            case "win-x64":
-                return GetWindowsDevices();
-            case "linux-x64":
-            case "linux-arm64":
-            case "osx-x64":
-            case "osx-arm64":
-                return GetPortAudioDevices();
-            default:
-                return "No devices available for this runtime.";
-        }
+        if (OperatingSystem.IsWindows())
+            return GetWindowsDevices();
+        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+            return GetPortAudioDevices();
+
+        return "No devices available for this runtime.";
     }
 
     public bool IsDefaultDeviceIndex(int deviceIndex)
     {
-        switch (_runtime)
-        {
-            case "linux-x64":
-            case "linux-arm64":
-            case "osx-x64":
-            case "osx-arm64":
-                return deviceIndex == -1;
-            default:
-                return deviceIndex == 0;
-        }
+        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+            return deviceIndex == -1;
+
+        return deviceIndex == 0;
     }
     
     #region Windows

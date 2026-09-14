@@ -1,10 +1,7 @@
-﻿using System.Runtime.InteropServices;
 using AudioDelay.Args;
 using AudioDelay.AudioRecorder;
 using AudioDelay.Helpers;
 using Serilog;
-
-var runtime = RuntimeInformation.RuntimeIdentifier;
 
 var deviceHandler = new DeviceHandler();
 
@@ -24,20 +21,14 @@ Log.Logger = LoggerConfigurator.ConfigureLogger(arguments).CreateLogger();
 
 AudioRecorder recorder;
 
-switch (runtime)
+if (OperatingSystem.IsWindows())
+  recorder = new WindowsAudioRecorder(arguments);
+else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+  recorder = new PortAudioRecorder(arguments);
+else
 {
-  case "win-x64":
-    recorder = new WindowsAudioRecorder(arguments);
-    break;
-  case "linux-x64":
-  case "linux-arm64":
-  case "osx-x64":
-  case "osx-arm64":
-    recorder = new PortAudioRecorder(arguments);
-    break;
-  default:
-    Console.WriteLine($"Unsupported OS. ({runtime})");
-    return 1;
+  Console.WriteLine("Unsupported OS.");
+  return 1;
 }
 
 if (arguments.ListDevices)
