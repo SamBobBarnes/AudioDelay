@@ -57,7 +57,20 @@ dotnet publish -c Release -r win-x64 --self-contained
 ```
 
 ## Development
-This project is developed in C# using JetBrains Rider. The project includes unit tests to ensure the functionality of the application.  
+This project is developed in C# and includes unit tests to ensure the functionality of the application.
+
+## Platform support
+
+- **Windows:** uses `NAudio`.
+- **Linux/macOS:** uses `PortAudioSharp`, which requires the PortAudio native library to be available at runtime.
+
+On Debian/Ubuntu, install PortAudio with:
+
+```bash
+sudo apt-get install portaudio19-dev
+```
+
+Then publish or run normally with the same CLI arguments.
 
 This project also uses Inno Setup to create the setup file from script.
 

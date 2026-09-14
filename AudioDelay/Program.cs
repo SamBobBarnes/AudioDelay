@@ -29,6 +29,12 @@ switch (runtime)
   case "win-x64":
     recorder = new WindowsAudioRecorder(arguments);
     break;
+  case "linux-x64":
+  case "linux-arm64":
+  case "osx-x64":
+  case "osx-arm64":
+    recorder = new PortAudioRecorder(arguments);
+    break;
   default:
     Console.WriteLine("Unsupported OS.");
     return 1;
@@ -69,5 +75,6 @@ catch (Exception ex)
 }
 finally
 {
+  recorder.Dispose();
   Log.CloseAndFlush();
 }

@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using PortAudioSharp;
 
 namespace AudioDelay.Helpers;
 
@@ -9,6 +10,7 @@ public interface IDeviceHandler
     int GetInputDeviceCount();
     int GetOutputDeviceCount();
     string GetDevices();
+    bool IsDefaultDeviceIndex(int deviceIndex);
 }
 
 public class DeviceHandler : IDeviceHandler
@@ -21,6 +23,11 @@ public class DeviceHandler : IDeviceHandler
         {
             case "win-x64":
                 return GetWindowsInputDeviceCount();
+            case "linux-x64":
+            case "linux-arm64":
+            case "osx-x64":
+            case "osx-arm64":
+                return GetPortAudioInputDeviceCount();
             default:
                 return -1;
         }
@@ -32,6 +39,11 @@ public class DeviceHandler : IDeviceHandler
         {
             case "win-x64":
                 return GetWindowsOutputDeviceCount();
+            case "linux-x64":
+            case "linux-arm64":
+            case "osx-x64":
+            case "osx-arm64":
+                return GetPortAudioOutputDeviceCount();
             default:
                 return -1;
         }
@@ -43,8 +55,27 @@ public class DeviceHandler : IDeviceHandler
         {
             case "win-x64":
                 return GetWindowsDevices();
+            case "linux-x64":
+            case "linux-arm64":
+            case "osx-x64":
+            case "osx-arm64":
+                return GetPortAudioDevices();
             default:
                 return "No devices available for this runtime.";
+        }
+    }
+
+    public bool IsDefaultDeviceIndex(int deviceIndex)
+    {
+        switch (_runtime)
+        {
+            case "linux-x64":
+            case "linux-arm64":
+            case "osx-x64":
+            case "osx-arm64":
+                return deviceIndex == -1;
+            default:
+                return deviceIndex == 0;
         }
     }
     
@@ -93,6 +124,70 @@ public class DeviceHandler : IDeviceHandler
     }
     
     #endregion
-    
-    
+
+    #region PortAudio
+
+    private string GetPortAudioDevices()
+    {
+        PortAudio.Initialize();
+        try
+        {
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.AppendLine("Input devices:");
+            stringBuilder.AppendLine($"-1: Default Input Device ({PortAudio.GetDeviceInfo(PortAudio.DefaultInputDevice).name})");
+            for (var i = 0; i < PortAudio.DeviceCount; i++)
+            {
+                var device = PortAudio.GetDeviceInfo(i);
+                if (device.maxInputChannels > 0)
+                    stringBuilder.AppendLine($"{i}: {device.name}");
+            }
+
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("Playback devices:");
+            stringBuilder.AppendLine($"-1: Default Output Device ({PortAudio.GetDeviceInfo(PortAudio.DefaultOutputDevice).name})");
+            for (var i = 0; i < PortAudio.DeviceCount; i++)
+            {
+                var device = PortAudio.GetDeviceInfo(i);
+                if (device.maxOutputChannels > 0)
+                    stringBuilder.AppendLine($"{i}: {device.name}");
+            }
+
+            return stringBuilder.ToString();
+        }
+        finally
+        {
+            PortAudio.Terminate();
+        }
+    }
+
+    private int GetPortAudioInputDeviceCount()
+    {
+        PortAudio.Initialize();
+        try
+        {
+            return Enumerable.Range(0, PortAudio.DeviceCount)
+                .Count(index => PortAudio.GetDeviceInfo(index).maxInputChannels > 0);
+        }
+        finally
+        {
+            PortAudio.Terminate();
+        }
+    }
+
+    private int GetPortAudioOutputDeviceCount()
+    {
+        PortAudio.Initialize();
+        try
+        {
+            return Enumerable.Range(0, PortAudio.DeviceCount)
+                .Count(index => PortAudio.GetDeviceInfo(index).maxOutputChannels > 0);
+        }
+        finally
+        {
+            PortAudio.Terminate();
+        }
+    }
+
+    #endregion
 }

@@ -368,7 +368,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
   public void ParseOutputDevice_ShouldReturnInputWhenOutputDeviceFlagIsPresent()
   {
     var args = new List<string> { "--output-device", "1" };
-    _deviceHandler.GetOutputDeviceCount().Returns(1);
+    _deviceHandler.GetOutputDeviceCount().Returns(2);
 
     var actual = ParseOutputDevice(args);
 
@@ -379,7 +379,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
   public void ParseOutputDevice_ShouldReturnInputWhenOutputDeviceFlagIsPresent_Short()
   {
     var args = new List<string> { "-o", "1" };
-    _deviceHandler.GetOutputDeviceCount().Returns(1);
+    _deviceHandler.GetOutputDeviceCount().Returns(2);
 
     var actual = ParseOutputDevice(args);
 
@@ -393,7 +393,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
   )
   {
     var args = new List<string> { "--output-device", device.ToString() };
-    _deviceHandler.GetOutputDeviceCount().Returns(1);
+    _deviceHandler.GetOutputDeviceCount().Returns(0);
 
     Action act = () => ParseOutputDevice(args);
 

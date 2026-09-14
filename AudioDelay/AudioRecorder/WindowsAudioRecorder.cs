@@ -44,6 +44,12 @@ public class WindowsAudioRecorder : AudioRecorder
         _waveIn.StopRecording();
     }
 
+    public override void Dispose()
+    {
+        _waveIn.Dispose();
+        _waveOut.Dispose();
+    }
+
     private void OnDataAvailable(object sender, WaveInEventArgs e)
     {
         _bufferedWaveProvider.AddSamples(e.Buffer, 0, e.BytesRecorded);

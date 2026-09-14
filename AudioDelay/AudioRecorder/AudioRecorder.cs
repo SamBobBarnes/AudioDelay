@@ -10,4 +10,5 @@ public abstract class AudioRecorder
   public abstract void StopPlayback();
   public abstract void Start();
   public abstract void Stop();
+  public abstract void Dispose();
 }
