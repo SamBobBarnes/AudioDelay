@@ -1,6 +1,9 @@
 ﻿using AudioDelay.Helpers;
 using FluentAssertions;
 using NSubstitute;
+using Serilog;
+using Serilog.Sinks.InMemory;
+using Serilog.Sinks.InMemory.Assertions;
 
 namespace Tests.Helpers;
 
@@ -47,20 +50,19 @@ public class DelayHandlerTests
     [Fact]
     public void Wait_Debug_LogsCorrectly()
     {
-        var stringWriter = new StringWriter();
-        Console.SetOut(stringWriter);
-        
-        _delayHandler.Wait(3000, true);
-        
-        var output = stringWriter.ToString().Split(Environment.NewLine);
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.InMemory()
+            .CreateLogger();
 
-        output.Should().Contain("Waiting for 3000 milliseconds...");
-        output.Should().Contain("Waited for 1 seconds...");
-        output.Should().Contain("Waited for 2 seconds...");
-        output.Should().Contain("Waited for 3 seconds...");
-        output.Should().Contain("Done waiting.");
-        
-        var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-        Console.SetOut(standardOutput);
+        _delayHandler.Wait(3000, true);
+
+        InMemorySink.Instance.Should().HaveMessage("Waiting for 3000 milliseconds...");
+        InMemorySink.Instance.Should().HaveMessage("Waited for 1 seconds...");
+        InMemorySink.Instance.Should().HaveMessage("Waited for 2 seconds...");
+        InMemorySink.Instance.Should().HaveMessage("Waited for 3 seconds...");
+        InMemorySink.Instance.Should().HaveMessage("Done waiting.");
+
+        Log.CloseAndFlush();
     }
 }
