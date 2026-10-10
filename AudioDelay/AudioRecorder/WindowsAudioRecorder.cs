@@ -44,6 +44,12 @@ public class WindowsAudioRecorder : AudioRecorder
         _waveIn.StopRecording();
     }
 
+    public override void Shutdown()
+    {
+        Stop();
+        StopPlayback();
+    }
+
     public override void Dispose()
     {
         _waveIn.Dispose();

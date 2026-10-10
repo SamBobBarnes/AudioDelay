@@ -2,6 +2,7 @@ using AudioDelay.Args;
 using AudioDelay.AudioRecorder;
 using AudioDelay.Helpers;
 using Serilog;
+using System.Runtime.InteropServices;
 
 var deviceHandler = new DeviceHandler();
 
@@ -31,6 +32,38 @@ else
 {
   Console.WriteLine("Unsupported OS.");
   return 1;
+}
+
+var shutdownRequested = 0;
+void ShutdownRecorder()
+{
+  if (Interlocked.Exchange(ref shutdownRequested, 1) == 1)
+    return;
+
+  try
+  {
+    recorder.Shutdown();
+  }
+  catch (Exception ex)
+  {
+    Log.Error(ex, "Failed to shut down audio recorder cleanly.");
+  }
+}
+
+Console.CancelKeyPress += (_, eventArgs) =>
+{
+  eventArgs.Cancel = true;
+  ShutdownRecorder();
+};
+
+AppDomain.CurrentDomain.ProcessExit += (_, _) => ShutdownRecorder();
+
+if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+{
+  PosixSignalRegistration? sigtermRegistration = null;
+  PosixSignalRegistration? sigintRegistration = null;
+  sigtermRegistration = PosixSignalRegistration.Create(PosixSignal.SIGTERM, _ => ShutdownRecorder());
+  sigintRegistration = PosixSignalRegistration.Create(PosixSignal.SIGINT, _ => ShutdownRecorder());
 }
 
 if (arguments.ListDevices)
@@ -68,6 +101,7 @@ catch (Exception ex)
 }
 finally
 {
+  ShutdownRecorder();
   recorder.Dispose();
   Log.CloseAndFlush();
 }

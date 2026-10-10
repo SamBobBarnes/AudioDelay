@@ -25,6 +25,7 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
   private int _playbackReadOffset;
   private bool _captureRunning;
   private bool _playbackRunning;
+  private bool _shutdown;
   private bool _disposed;
 
   public LinuxAlsaAudioRecorder(Arguments args) : base(args)
@@ -75,7 +76,7 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
       playbackThread = _playbackThread;
     }
 
-    AlsaNative.Drain(_playbackHandle);
+    AlsaNative.Drop(_playbackHandle);
     playbackThread?.Join();
   }
 
@@ -112,14 +113,32 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
     captureThread?.Join();
   }
 
+  public override void Shutdown()
+  {
+    lock (_stateLock)
+    {
+      if (_shutdown)
+        return;
+
+      _shutdown = true;
+      _captureRunning = false;
+      _playbackRunning = false;
+    }
+
+    AlsaNative.Drop(_captureHandle);
+    AlsaNative.Drop(_playbackHandle);
+
+    _captureThread?.Join();
+    _playbackThread?.Join();
+  }
+
   public override void Dispose()
   {
     if (_disposed)
       return;
 
     _disposed = true;
-    Stop();
-    StopPlayback();
+    Shutdown();
     AlsaNative.Close(_captureHandle);
     AlsaNative.Close(_playbackHandle);
   }
