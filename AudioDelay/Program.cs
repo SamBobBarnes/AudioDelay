@@ -94,7 +94,7 @@ try
   recorder.Stop();
   Log.Information("Stopped recording.");
 
-  delayHandler.Wait(arguments.Delay, arguments.Debug);
+  delayHandler.Wait(arguments.Delay + arguments.Runtime, arguments.Debug);
 
   recorder.StopPlayback();
   Log.Information("Stopped playback.");

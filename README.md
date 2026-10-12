@@ -12,7 +12,7 @@ AudioDelay is a C# application that records audio and plays it back after a spec
 You can configure the application using the following command-line arguments:
 
 - `--delay`: The delay before the audio starts playing back (in milliseconds).
-- `--content-length`: The length of the audio content to record (in milliseconds).
+- `--content-length`: The total duration to record from the microphone (in milliseconds).
 - `--help`: Display the help text.
 - `--debug`: Enable debug mode for detailed logging.
 - `--test-output`: Ignore the other flags and play a few test beeps on the default output device.
@@ -22,7 +22,7 @@ Example usage:
 ```bash
 dotnet run -- --delay 2000 --content-length 3000 --debug
 ```
-This will start the application, record for 3000 milliseconds, and then play back the audio after a delay of 2000 milliseconds. Debug mode is also enabled.
+This will start the application, record for 3000 milliseconds, and start playback after a delay of 2000 milliseconds. Debug mode is also enabled.
 
 ```bash
 dotnet run -- --test-output

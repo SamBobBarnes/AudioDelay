@@ -469,7 +469,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
     actual.Should().BeEquivalentTo(new Arguments
     {
       Delay = 5000,
-      Runtime = 0,
+      Runtime = 5000,
       Help = false,
       Debug = false,
       InputDevice = 0,
@@ -504,7 +504,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
       .BeEquivalentTo(new Arguments
       {
         Delay = 2000,
-        Runtime = 1000,
+        Runtime = 3000,
         Help = true,
         Debug = true,
         InputDevice = 1,
@@ -551,10 +551,10 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
   }
 
   [Theory]
-  [InlineData("--ms", 3, 1)]
-  [InlineData("--s", 3000, 1000)]
-  [InlineData("--m", 180000, 60000)]
-  [InlineData("--h", 10800000, 3600000)]
+  [InlineData("--ms", 3, 4)]
+  [InlineData("--s", 3000, 4000)]
+  [InlineData("--m", 180000, 240000)]
+  [InlineData("--h", 10800000, 14400000)]
   public void ParseArgs_ShouldConvertTimeWhenTimeFlagIsPresent(string flag, int delayResult, int runtimeResult)
   {
     var args = new[] { "--delay", "3", "--content-length", "4", flag };
@@ -572,13 +572,24 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
   }
 
   [Fact]
-  public void ParseArgs_ShouldThrowExceptionWhenContentLengthIsLessThanDelay()
+  public void ParseArgs_ShouldAllowContentLengthToBeLessThanDelay()
   {
     var args = new[] { "--delay", "3000", "--content-length", "2000" };
 
-    Action act = () => ParseArgs(args);
+    var actual = ParseArgs(args);
 
-    act.Should().Throw<ArgumentException>().WithMessage("Content length must be greater or equal to than the delay.");
+    actual.Should().BeEquivalentTo(new Arguments
+    {
+      Delay = 3000,
+      Runtime = 2000,
+      Help = false,
+      Debug = false,
+      ListDevices = false,
+      InputDevice = 0,
+      OutputDevice = 0,
+      LoggerName = string.Empty,
+      LoggerUrl = null
+    });
   }
 
   #endregion

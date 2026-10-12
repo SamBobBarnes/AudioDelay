@@ -33,10 +33,7 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     }
 
     result.Delay = ParseDelay(argsList) * multiplier;
-    var contentLength = ParseContentLength(argsList) * multiplier;
-    if (contentLength < result.Delay)
-      throw new ArgumentException("Content length must be greater or equal to than the delay.");
-    result.Runtime = contentLength - result.Delay;
+    result.Runtime = ParseContentLength(argsList) * multiplier;
     result.Debug = ParseDebug(argsList);
     result.ListDevices = ParseListDevices(argsList);
     result.InputDevice = ParseInputDevice(argsList);
@@ -265,7 +262,7 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     + "--delay [int] - Set the delay in milliseconds\n"
     + "--content-length [int] - Set the content length in milliseconds\n\n"
     + "--test-output - Play test beeps on the default output device and ignore all other options\n\n"
-    + "    Content length must be greater than the delay\n\n"
+    + "    Content length is the total time to record from the microphone\n\n"
     + "Time format flags:\n"
     + "    --ms - Set the time format to milliseconds\n"
     + "    --s - Set the time format to seconds\n"
@@ -280,10 +277,10 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     + "    --logger elasticsearch;http://localhost:9200 - Set the logger to Elasticsearch\n\n"
     + "Example usage:\n"
     + "    \"audiodelay --delay 5 --content-length 10 --s\"\n"
-    + "    This will record audio for 10 seconds and play it back with a 5 second delay\n"
+    + "    This will record audio for 10 seconds and start playback after a 5 second delay\n"
     + "    The time format is set to seconds\n\n"
     + "    \"audiodelay --delay 5000 --content-length 10000\"\n"
-    + "    This will record audio for 10 seconds and play it back with a 5 second delay\n"
+    + "    This will record audio for 10 seconds and start playback after a 5 second delay\n"
     + "    The time format is set to milliseconds\n\n"
     + "    \"audiodelay --test-output\"\n"
     + "    This will play a few test beeps through the default output device\n\n";

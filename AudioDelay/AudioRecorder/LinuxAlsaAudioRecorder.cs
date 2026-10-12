@@ -32,6 +32,7 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
   private int _playbackReadOffset;
   private bool _captureRunning;
   private bool _playbackRunning;
+  private bool _captureCompleted;
   private bool _shutdown;
   private bool _disposed;
 
@@ -103,6 +104,7 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
       if (_captureRunning)
         return;
 
+      _captureCompleted = false;
       _captureRunning = true;
       _captureThread = new Thread(CaptureLoop)
       {
@@ -127,6 +129,11 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
 
     AlsaNative.Drop(_captureHandle);
     captureThread?.Join();
+
+    lock (_stateLock)
+    {
+      _captureCompleted = true;
+    }
   }
 
   public override void Shutdown()
@@ -161,21 +168,31 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
 
   private void CaptureLoop()
   {
-    while (_captureRunning)
+    try
     {
-      var framesRead = AlsaNative.ReadInterleaved(_captureHandle, _captureBuffer, PeriodFrames);
-      if (framesRead < 0)
+      while (_captureRunning)
       {
-        framesRead = AlsaNative.Recover(_captureHandle, framesRead, 1);
-        AlsaNative.ThrowIfError(framesRead, "recovering ALSA capture stream");
-        continue;
-      }
+        var framesRead = AlsaNative.ReadInterleaved(_captureHandle, _captureBuffer, PeriodFrames);
+        if (framesRead < 0)
+        {
+          framesRead = AlsaNative.Recover(_captureHandle, framesRead, 1);
+          AlsaNative.ThrowIfError(framesRead, "recovering ALSA capture stream");
+          continue;
+        }
 
-      var bytesRead = checked((int)framesRead * (int)ChannelCount * BytesPerSample);
-      lock (_bufferLock)
+        var bytesRead = checked((int)framesRead * (int)ChannelCount * BytesPerSample);
+        lock (_bufferLock)
+        {
+          for (var i = 0; i < bytesRead; i++)
+            _audioBuffer.Add(_captureBuffer[i]);
+        }
+      }
+    }
+    finally
+    {
+      lock (_stateLock)
       {
-        for (var i = 0; i < bytesRead; i++)
-          _audioBuffer.Add(_captureBuffer[i]);
+        _captureCompleted = true;
       }
     }
   }
@@ -206,6 +223,18 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
     lock (_bufferLock)
     {
       var availableDelayedBytes = _audioBuffer.Count - _playbackReadOffset - _delayBytes;
+      if (availableDelayedBytes <= 0)
+      {
+        if (!_captureCompleted)
+          return;
+
+        var remainingBufferedBytes = _audioBuffer.Count - _playbackReadOffset;
+        if (remainingBufferedBytes <= 0)
+          return;
+
+        availableDelayedBytes = remainingBufferedBytes;
+      }
+
       if (availableDelayedBytes <= 0)
         return;
 
