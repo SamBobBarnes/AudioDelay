@@ -3,6 +3,7 @@
 public class Arguments
 {
   public bool Help { get; set; }
+  public bool TestOutput { get; set; }
   public int Delay { get; set; }
   public int Runtime { get; set; }
   public int RecordingLength => Delay + Runtime;

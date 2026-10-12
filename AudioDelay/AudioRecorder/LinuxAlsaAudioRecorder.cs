@@ -5,6 +5,13 @@ namespace AudioDelay.AudioRecorder;
 
 public class LinuxAlsaAudioRecorder : AudioRecorder
 {
+  private static readonly (double Frequency, int DurationMs)[] TestTonePattern =
+  [
+    (440d, 250),
+    (660d, 250),
+    (880d, 400)
+  ];
+
   private const uint SampleRate = 48000;
   private const uint ChannelCount = 1;
   private const int BytesPerSample = sizeof(short);
@@ -61,6 +68,15 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
         Name = "alsa-playback"
       };
       _playbackThread.Start();
+    }
+  }
+
+  public override void PlayTestOutput()
+  {
+    foreach (var (frequency, durationMs) in TestTonePattern)
+    {
+      WriteTestTone(frequency, durationMs);
+      Thread.Sleep(125);
     }
   }
 
@@ -180,26 +196,7 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
 
   private long WriteFullPeriod()
   {
-    var totalFramesWritten = 0L;
-    while (totalFramesWritten < PeriodFrames && _playbackRunning)
-    {
-      var frameOffset = (int)totalFramesWritten;
-      var framesRemaining = PeriodFrames - frameOffset;
-      var byteOffset = frameOffset * (int)ChannelCount * BytesPerSample;
-      var byteCount = framesRemaining * (int)ChannelCount * BytesPerSample;
-      var tempBuffer = new byte[byteCount];
-      Buffer.BlockCopy(_playbackBuffer, byteOffset, tempBuffer, 0, byteCount);
-
-      var framesWritten = AlsaNative.WriteInterleaved(_playbackHandle, tempBuffer, (ulong)framesRemaining);
-      if (framesWritten < 0)
-        return framesWritten;
-      if (framesWritten == 0)
-        break;
-
-      totalFramesWritten += framesWritten;
-    }
-
-    return totalFramesWritten;
+    return WriteBuffer(_playbackBuffer, PeriodFrames);
   }
 
   private void FillPlaybackBuffer()
@@ -224,5 +221,56 @@ public class LinuxAlsaAudioRecorder : AudioRecorder
       _audioBuffer.RemoveRange(0, _playbackReadOffset);
       _playbackReadOffset = 0;
     }
+  }
+
+  private void WriteTestTone(double frequency, int durationMs)
+  {
+    var totalFrames = checked((int)((long)SampleRate * durationMs / 1000));
+    var frameIndex = 0;
+
+    while (frameIndex < totalFrames)
+    {
+      Array.Clear(_playbackBuffer);
+
+      var framesThisPeriod = Math.Min(PeriodFrames, totalFrames - frameIndex);
+      for (var i = 0; i < framesThisPeriod; i++)
+      {
+        var sample = (short)(Math.Sin(2 * Math.PI * frequency * (frameIndex + i) / SampleRate) * short.MaxValue * 0.2);
+        _playbackBuffer[i * BytesPerSample] = (byte)(sample & 0xff);
+        _playbackBuffer[(i * BytesPerSample) + 1] = (byte)((sample >> 8) & 0xff);
+      }
+
+      var framesWritten = WriteBuffer(_playbackBuffer, framesThisPeriod);
+      if (framesWritten < 0)
+      {
+        framesWritten = AlsaNative.Recover(_playbackHandle, framesWritten, 1);
+        AlsaNative.ThrowIfError(framesWritten, "recovering ALSA playback stream");
+        continue;
+      }
+
+      frameIndex += framesThisPeriod;
+    }
+  }
+
+  private long WriteBuffer(byte[] buffer, int framesToWrite)
+  {
+    var totalFramesWritten = 0L;
+    while (totalFramesWritten < framesToWrite)
+    {
+      var frameOffset = (int)totalFramesWritten;
+      var framesRemaining = framesToWrite - frameOffset;
+      var byteOffset = frameOffset * (int)ChannelCount * BytesPerSample;
+      var byteCount = framesRemaining * (int)ChannelCount * BytesPerSample;
+      var tempBuffer = new byte[byteCount];
+      Buffer.BlockCopy(buffer, byteOffset, tempBuffer, 0, byteCount);
+
+      var framesWritten = AlsaNative.WriteInterleaved(_playbackHandle, tempBuffer, (ulong)framesRemaining);
+      if (framesWritten <= 0)
+        return framesWritten;
+
+      totalFramesWritten += framesWritten;
+    }
+
+    return totalFramesWritten;
   }
 }

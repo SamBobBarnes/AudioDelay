@@ -10,6 +10,10 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     var result = new Arguments();
     var argsList = args.ToList();
     result.Help = ParseHelp(argsList);
+    result.TestOutput = ParseTestOutput(argsList);
+
+    if (result.TestOutput)
+      return result;
 
     var multiplier = 1;
     switch (ParseTimeFormat(argsList))
@@ -70,6 +74,12 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     }
 
     return delayInt;
+  }
+
+  protected bool ParseTestOutput(List<string> args)
+  {
+    if (args.Contains("--test-output")) return true;
+    return false;
   }
 
   protected int ParseContentLength(List<string> args)
@@ -254,6 +264,7 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     + "Options:\n"
     + "--delay [int] - Set the delay in milliseconds\n"
     + "--content-length [int] - Set the content length in milliseconds\n\n"
+    + "--test-output - Play test beeps on the default output device and ignore all other options\n\n"
     + "    Content length must be greater than the delay\n\n"
     + "Time format flags:\n"
     + "    --ms - Set the time format to milliseconds\n"
@@ -273,5 +284,7 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     + "    The time format is set to seconds\n\n"
     + "    \"audiodelay --delay 5000 --content-length 10000\"\n"
     + "    This will record audio for 10 seconds and play it back with a 5 second delay\n"
-    + "    The time format is set to milliseconds\n\n";
+    + "    The time format is set to milliseconds\n\n"
+    + "    \"audiodelay --test-output\"\n"
+    + "    This will play a few test beeps through the default output device\n\n";
 }

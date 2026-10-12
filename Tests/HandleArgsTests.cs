@@ -211,6 +211,30 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
 
   #endregion
 
+  #region ParseTestOutput
+
+  [Fact]
+  public void ParseTestOutput_ShouldReturnFalseByDefault()
+  {
+    var args = new List<string>();
+
+    var actual = ParseTestOutput(args);
+
+    actual.Should().BeFalse();
+  }
+
+  [Fact]
+  public void ParseTestOutput_ShouldReturnTrueWhenFlagIsPresent()
+  {
+    var args = new List<string> { "--test-output" };
+
+    var actual = ParseTestOutput(args);
+
+    actual.Should().BeTrue();
+  }
+
+  #endregion
+
   #region ParseDebug
 
   [Fact]
@@ -487,6 +511,43 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
         OutputDevice = 2,
         ListDevices = true
       });
+  }
+
+  [Fact]
+  public void ParseArgs_ShouldIgnoreOtherFlagsWhenTestOutputIsPresent()
+  {
+    var args = new[]
+    {
+      "--test-output",
+      "--delay",
+      "2000",
+      "--content-length",
+      "1000",
+      "--debug",
+      "--devices",
+      "--input-device",
+      "1",
+      "--output-device",
+      "2",
+      "--logger",
+      "loki;http://localhost:3100"
+    };
+
+    var actual = ParseArgs(args);
+
+    actual.Should().BeEquivalentTo(new Arguments
+    {
+      Help = false,
+      TestOutput = true,
+      Delay = 0,
+      Runtime = 0,
+      Debug = false,
+      ListDevices = false,
+      InputDevice = 0,
+      OutputDevice = 0,
+      LoggerName = string.Empty,
+      LoggerUrl = null
+    });
   }
 
   [Theory]

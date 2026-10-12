@@ -72,6 +72,13 @@ if (arguments.ListDevices)
   return 0;
 }
 
+if (arguments.TestOutput)
+{
+  Log.Information("Playing test output...");
+  recorder.PlayTestOutput();
+  return 0;
+}
+
 try
 {
   Log.Information("Starting recording...");

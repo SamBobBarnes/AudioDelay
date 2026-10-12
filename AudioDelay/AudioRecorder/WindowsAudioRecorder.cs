@@ -1,9 +1,17 @@
 ﻿using AudioDelay.Args;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace AudioDelay.AudioRecorder;
 public class WindowsAudioRecorder : AudioRecorder
 {
+    private static readonly (float Frequency, int DurationMs)[] TestTonePattern =
+    [
+        (440f, 250),
+        (660f, 250),
+        (880f, 400)
+    ];
+
     private readonly WaveInEvent _waveIn;
     private readonly WaveOutEvent _waveOut;
     private readonly BufferedWaveProvider _bufferedWaveProvider;
@@ -27,6 +35,32 @@ public class WindowsAudioRecorder : AudioRecorder
     public override void Play()
     {
         _waveOut.Play();
+    }
+
+    public override void PlayTestOutput()
+    {
+        using var waveOut = new WaveOutEvent();
+
+        foreach (var (frequency, durationMs) in TestTonePattern)
+        {
+            var signalGenerator = new SignalGenerator()
+            {
+                Gain = 0.2,
+                Frequency = frequency,
+                Type = SignalGeneratorType.Sin
+            };
+            signalGenerator.Frequency = frequency;
+            var tone = new OffsetSampleProvider(signalGenerator)
+            {
+                TakeSamples = signalGenerator.WaveFormat.SampleRate * durationMs / 1000
+            };
+
+            waveOut.Stop();
+            waveOut.Init(tone);
+            waveOut.Play();
+            while (waveOut.PlaybackState == PlaybackState.Playing)
+              Thread.Sleep(10);
+        }
     }
 
     public override void StopPlayback()
