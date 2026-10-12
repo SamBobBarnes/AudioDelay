@@ -33,7 +33,7 @@ public class HandleArgs(IDeviceHandler deviceHandler)
     }
 
     result.Delay = ParseDelay(argsList) * multiplier;
-    result.Runtime = ParseContentLength(argsList) * multiplier;
+    result.ContentLength = ParseContentLength(argsList) * multiplier;
     result.Debug = ParseDebug(argsList);
     result.ListDevices = ParseListDevices(argsList);
     result.InputDevice = ParseInputDevice(argsList);

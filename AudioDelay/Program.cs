@@ -81,20 +81,24 @@ if (arguments.TestOutput)
 
 try
 {
+  var recordingBeforePlaybackMs = Math.Min(arguments.Delay, arguments.ContentLength);
+  var recordingAfterPlaybackMs = Math.Max(arguments.ContentLength - arguments.Delay, 0);
+  var playbackAfterRecordingStopsMs = Math.Min(arguments.Delay, arguments.ContentLength);
+
   Log.Information("Starting recording...");
   recorder.Start();
 
-  delayHandler.Wait(arguments.Delay, arguments.Debug);
+  delayHandler.Wait(recordingBeforePlaybackMs, arguments.Debug);
 
   Log.Information("Starting playback...");
   recorder.Play();
 
-  delayHandler.Wait(arguments.Runtime, arguments.Debug);
+  delayHandler.Wait(recordingAfterPlaybackMs, arguments.Debug);
 
   recorder.Stop();
   Log.Information("Stopped recording.");
 
-  delayHandler.Wait(arguments.Delay + arguments.Runtime, arguments.Debug);
+  delayHandler.Wait(playbackAfterRecordingStopsMs, arguments.Debug);
 
   recorder.StopPlayback();
   Log.Information("Stopped playback.");

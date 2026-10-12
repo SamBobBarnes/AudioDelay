@@ -5,8 +5,8 @@ public class Arguments
   public bool Help { get; set; }
   public bool TestOutput { get; set; }
   public int Delay { get; set; }
-  public int Runtime { get; set; }
-  public int RecordingLength => Delay + Runtime;
+  public int ContentLength { get; set; }
+  public int RecordingLength => ContentLength;
   public bool Debug { get; set; }
   public bool ListDevices { get; set; }
   public int InputDevice { get; set; }

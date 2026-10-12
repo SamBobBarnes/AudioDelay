@@ -469,7 +469,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
     actual.Should().BeEquivalentTo(new Arguments
     {
       Delay = 5000,
-      Runtime = 5000,
+      ContentLength = 5000,
       Help = false,
       Debug = false,
       InputDevice = 0,
@@ -504,7 +504,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
       .BeEquivalentTo(new Arguments
       {
         Delay = 2000,
-        Runtime = 3000,
+        ContentLength = 3000,
         Help = true,
         Debug = true,
         InputDevice = 1,
@@ -540,7 +540,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
       Help = false,
       TestOutput = true,
       Delay = 0,
-      Runtime = 0,
+      ContentLength = 0,
       Debug = false,
       ListDevices = false,
       InputDevice = 0,
@@ -555,7 +555,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
   [InlineData("--s", 3000, 4000)]
   [InlineData("--m", 180000, 240000)]
   [InlineData("--h", 10800000, 14400000)]
-  public void ParseArgs_ShouldConvertTimeWhenTimeFlagIsPresent(string flag, int delayResult, int runtimeResult)
+  public void ParseArgs_ShouldConvertTimeWhenTimeFlagIsPresent(string flag, int delayResult, int contentLengthResult)
   {
     var args = new[] { "--delay", "3", "--content-length", "4", flag };
 
@@ -564,7 +564,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
     actual.Should().BeEquivalentTo(new Arguments
     {
       Delay = delayResult,
-      Runtime = runtimeResult,
+      ContentLength = contentLengthResult,
       Help = false,
       InputDevice = 0,
       OutputDevice = 0
@@ -581,7 +581,7 @@ public class HandleArgsTests() : HandleArgs(_deviceHandler)
     actual.Should().BeEquivalentTo(new Arguments
     {
       Delay = 3000,
-      Runtime = 2000,
+      ContentLength = 2000,
       Help = false,
       Debug = false,
       ListDevices = false,
