@@ -84,22 +84,40 @@ try
   var playbackDelay = Math.Max(arguments.Delay, 0);
   var recordingDuration = Math.Max(arguments.ContentLength, 0);
 
+  Action startPlayback = () =>
+  {
+    Log.Information("Starting playback...");
+    recorder.Play();
+  };
+
+  Action stopRecording = () =>
+  {
+    Log.Information("Stopping recording...");
+    recorder.Stop();
+    Log.Information("Stopped recording.");
+  };
+
+  Action stopPlayback = () =>
+  {
+    Log.Information("Stopping playback...");
+    recorder.StopPlayback();
+    Log.Information("Stopped playback.");
+  };
+
   Log.Information("Starting recording...");
   recorder.Start();
 
   if (playbackDelay > 0)
-    delayHandler.Wait(playbackDelay, arguments.Debug, recorder.Play);
+    delayHandler.Wait(playbackDelay, arguments.Debug, startPlayback);
   else
-    recorder.Play();
+    startPlayback();
 
   if (recordingDuration > 0)
-    delayHandler.Wait(recordingDuration, arguments.Debug, recorder.Stop);
+    delayHandler.Wait(recordingDuration, arguments.Debug, stopRecording);
   else
-    recorder.Stop();
+    stopRecording();
 
-  Log.Information("Stopped recording.");
-  recorder.StopPlayback();
-  Log.Information("Stopped playback.");
+  stopPlayback();
 
   return 0;
 }
