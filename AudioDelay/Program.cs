@@ -107,17 +107,19 @@ try
   Log.Information("Starting recording...");
   recorder.Start();
 
-  if (playbackDelay > 0)
-    delayHandler.Wait(playbackDelay, arguments.Debug, startPlayback);
-  else
-    startPlayback();
+  var startPlaybackTask = playbackDelay > 0
+    ? delayHandler.Schedule(playbackDelay, arguments.Debug, startPlayback)
+    : Task.Run(startPlayback);
 
-  if (recordingDuration > 0)
-    delayHandler.Wait(recordingDuration, arguments.Debug, stopRecording);
-  else
-    stopRecording();
+  var stopRecordingTask = recordingDuration > 0
+    ? delayHandler.Schedule(recordingDuration, arguments.Debug, stopRecording)
+    : Task.Run(stopRecording);
 
-  stopPlayback();
+  var stopPlaybackTask = playbackDelay + recordingDuration > 0
+    ? delayHandler.Schedule(playbackDelay + recordingDuration, arguments.Debug, stopPlayback)
+    : Task.Run(stopPlayback);
+
+  await Task.WhenAll(startPlaybackTask, stopRecordingTask, stopPlaybackTask);
 
   return 0;
 }

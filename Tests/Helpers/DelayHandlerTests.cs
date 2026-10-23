@@ -76,4 +76,16 @@ public class DelayHandlerTests
         callbackCalled.Should().BeTrue();
         _threadHandler.Received().Sleep(1000);
     }
+
+    [Fact]
+    public async Task Schedule_InvokesCallbackAfterDelayCompletes()
+    {
+        var callbackCalled = false;
+
+        var task = _delayHandler.Schedule(10, false, () => callbackCalled = true);
+
+        await task;
+
+        callbackCalled.Should().BeTrue();
+    }
 }
