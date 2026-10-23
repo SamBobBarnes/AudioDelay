@@ -88,17 +88,16 @@ try
   recorder.Start();
 
   if (playbackDelay > 0)
-    delayHandler.Wait(playbackDelay, arguments.Debug);
-
-  Log.Information("Starting playback...");
-  recorder.Play();
+    delayHandler.Wait(playbackDelay, arguments.Debug, recorder.Play);
+  else
+    recorder.Play();
 
   if (recordingDuration > 0)
-    delayHandler.Wait(recordingDuration, arguments.Debug);
+    delayHandler.Wait(recordingDuration, arguments.Debug, recorder.Stop);
+  else
+    recorder.Stop();
 
-  recorder.Stop();
   Log.Information("Stopped recording.");
-
   recorder.StopPlayback();
   Log.Information("Stopped playback.");
 

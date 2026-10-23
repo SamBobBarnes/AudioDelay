@@ -4,7 +4,7 @@ namespace AudioDelay.Helpers;
 
 public class DelayHandler(IThreadHandler threadHandler)
 {
-  public void Wait(int ms, bool debug)
+  public void Wait(int ms, bool debug, Action? callback = null)
   {
     if (debug)
     {
@@ -24,5 +24,7 @@ public class DelayHandler(IThreadHandler threadHandler)
     }
     else
       threadHandler.Sleep(ms);
+
+    callback?.Invoke();
   }
 }

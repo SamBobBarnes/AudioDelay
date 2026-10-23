@@ -65,4 +65,15 @@ public class DelayHandlerTests
 
         Log.CloseAndFlush();
     }
+
+    [Fact]
+    public void Wait_InvokesCallbackAfterDelayCompletes()
+    {
+        var callbackCalled = false;
+
+        _delayHandler.Wait(1000, false, () => callbackCalled = true);
+
+        callbackCalled.Should().BeTrue();
+        _threadHandler.Received().Sleep(1000);
+    }
 }
